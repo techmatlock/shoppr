@@ -1,11 +1,16 @@
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import { NotFound } from "./pages/NotFound";
+import { Home } from "./pages/Home";
+import { Layout } from "./components/Layout";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <h1>title</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   );
 }
-
-export default App;
