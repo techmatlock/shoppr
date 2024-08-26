@@ -1,3 +1,3 @@
 export function SideBar() {
-  return <div>SideBar</div>;
+  return <div className="shadow-md h-full"></div>;
 }

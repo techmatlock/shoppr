@@ -1,17 +1,23 @@
+import { AddNewForm } from "../components/AddNewForm";
+import { ShoppingList } from "../components/ShoppingList";
 import { SideBar } from "../components/SideBar";
 
-export function Home() {
+type Props = {
+  isMobile: boolean;
+};
+
+export function Home({ isMobile }: Props) {
   return (
     <main className="grid grid-cols-1 md:grid-cols-[3fr_1fr]">
       <section>
-        <form className="flex items-center justify-between">
-          <input type="text" className="w-full border-2 shadow-sm" placeholder="Add task" />
-          <button className="p-2 rounded-md bg-purple-500">Add New</button>
-        </form>
+        <AddNewForm />
+        <ShoppingList isMobile={isMobile} />
       </section>
-      <section>
-        <SideBar />
-      </section>
+      {!isMobile && (
+        <section>
+          <SideBar />
+        </section>
+      )}
     </main>
   );
 }
