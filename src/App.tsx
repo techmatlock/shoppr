@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import { NotFound } from "./pages/NotFound";
 import { Home } from "./pages/Home";
@@ -26,14 +26,30 @@ export default function App() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Home isMobile={isMobile} />,
+      index: true,
+    },
+    {
+      path: "/sign-in",
+      element: <AuthPage isMobile={isMobile} mode={"sign-in"} />,
+    },
+    {
+      path: "/sign-up",
+      element: <AuthPage isMobile={isMobile} mode={"sign-up"} />,
+    },
+    {
+      path: "*",
+      element: <NotFound />,
+    },
+  ]);
+
   return (
-    <Routes>
-      <Route path="/" element={<Header />}>
-        <Route index element={<Home isMobile={isMobile} />} />
-        <Route path="*" element={<NotFound />} />
-        <Route path="/sign-in" element={<AuthPage isMobile={isMobile} mode="sign-in" />} />
-        <Route path="/sign-up" element={<AuthPage isMobile={isMobile} mode="sign-up" />} />
-      </Route>
-    </Routes>
+    <div>
+      <Header />
+      <RouterProvider router={router} />
+    </div>
   );
 }

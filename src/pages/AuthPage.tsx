@@ -7,7 +7,7 @@ type Props = {
 };
 export function AuthPage({ mode, isMobile }: Props) {
   return (
-    <div className={isMobile ? "flex justify-center rounded-md mx-10 py-8" : "flex justify-center rounded-md mx-72 py-8"}>
+    <div className={isMobile ? "" : ""}>
       {mode === "sign-up" && <RegistrationForm />}
       {mode === "sign-in" && <SignInForm />}
     </div>
