@@ -14,7 +14,7 @@ export function Home({ isMobile }: Props) {
         <ShoppingList isMobile={isMobile} />
       </section>
       {!isMobile && (
-        <section>
+        <section className="shadow-md rounded-md h-full ml-4">
           <SideBar />
         </section>
       )}
