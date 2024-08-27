@@ -4,6 +4,7 @@ import { NotFound } from "./pages/NotFound";
 import { Home } from "./pages/Home";
 import { Header } from "./components/Header";
 import { useEffect, useState } from "react";
+import { AuthPage } from "./pages/AuthPage";
 
 export default function App() {
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -30,6 +31,8 @@ export default function App() {
       <Route path="/" element={<Header />}>
         <Route index element={<Home isMobile={isMobile} />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/sign-in" element={<AuthPage isMobile={isMobile} mode="sign-in" />} />
+        <Route path="/sign-up" element={<AuthPage isMobile={isMobile} mode="sign-up" />} />
       </Route>
     </Routes>
   );
