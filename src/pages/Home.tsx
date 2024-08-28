@@ -8,7 +8,7 @@ type Props = {
 
 export function Home({ isMobile }: Props) {
   return (
-    <main className="grid grid-cols-1 md:grid-cols-[3fr_1fr]">
+    <main className="grid grid-cols-1 md:grid-cols-[3fr_1fr] px-12">
       <section>
         <AddNewForm />
         <ShoppingList isMobile={isMobile} />
