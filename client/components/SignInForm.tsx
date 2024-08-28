@@ -7,6 +7,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/f
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Link } from "react-router-dom";
+import React from "react";
 
 type Props = {
   isMobile: boolean;

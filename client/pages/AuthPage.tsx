@@ -1,5 +1,6 @@
 import { RegistrationForm } from "../components/RegistrationForm";
 import { SignInForm } from "../components/SignInForm";
+import React from "react";
 
 type Props = {
   mode: "sign-up" | "sign-in";
