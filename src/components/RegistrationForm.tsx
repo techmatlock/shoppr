@@ -6,6 +6,7 @@ import { z } from "zod";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Link } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(8, {
@@ -84,14 +85,22 @@ export function RegistrationForm({ isMobile }: Props) {
                     </FormItem>
                   )}
                 />
-                <div className="flex justify-center">
+                <div className="flex flex-col justify-center space-y-4">
                   <Button type="submit" className="px-24">
                     Submit
+                  </Button>
+                  <Button type="submit" className="px-24">
+                    Continue with Google
                   </Button>
                 </div>
               </form>
             </FormProvider>
-            <p className="mt-4">Already have an account? Login here</p>
+            <p className="mt-4">
+              Already have an account?{" "}
+              <Link to="/sign-in" className="text-blue-500">
+                Login here
+              </Link>
+            </p>
           </div>
         </>
       )}
@@ -140,14 +149,22 @@ export function RegistrationForm({ isMobile }: Props) {
                     </FormItem>
                   )}
                 />
-                <div className="flex justify-center">
+                <div className="flex flex-col justify-center space-y-4">
                   <Button type="submit" className="px-24">
-                    Submit
+                    Register
+                  </Button>
+                  <Button type="submit" className="px-24">
+                    Continue with Google
                   </Button>
                 </div>
               </form>
             </FormProvider>
-            <p className="mt-4">Already have an account? Login here</p>
+            <p className="mt-4">
+              Already have an account?{" "}
+              <Link to="/sign-in" className="text-blue-500">
+                Login here
+              </Link>
+            </p>
           </div>
         </>
       )}
