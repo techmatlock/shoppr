@@ -1,6 +1,7 @@
 import { AddNewForm } from "../components/AddNewForm";
 import { ShoppingList } from "../components/ShoppingList";
 import { SideBar } from "../components/SideBar";
+import React from "react";
 
 type Props = {
   isMobile: boolean;
