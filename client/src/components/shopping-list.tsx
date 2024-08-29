@@ -7,7 +7,12 @@ type Props = {
 export function ShoppingList({ isMobile }: Props) {
   return (
     <>
-      <h1 className="mt-2 text-lg">On hold</h1>
+      <div className="grid grid-cols-1 grid-flow-col md:grid-cols-4 items-center gap-8 my-6">
+        <p>Item</p>
+        <p>Status</p>
+        <p>Needed By</p>
+        <p>I Want</p>
+      </div>
       <ul>
         {shoppingList.map((item) => (
           <li key={item.shoppingItemId} className="grid grid-cols-1 grid-flow-col md:grid-cols-4 items-center my-6 border-b-2">
