@@ -24,7 +24,7 @@ export function IndexPage() {
   }, []);
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] px-12">
       <section>
         <AddNewForm />
         <ShoppingList isMobile={isMobile} />
@@ -34,6 +34,6 @@ export function IndexPage() {
           <SideBar />
         </section>
       )}
-    </>
+    </div>
   );
 }

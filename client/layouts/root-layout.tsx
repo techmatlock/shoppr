@@ -19,7 +19,7 @@ export default function RootLayout() {
           <p className="pl-2 text-md">shoppr</p>
         </div>
       </header>
-      <main className="grid grid-cols-1 px-12">
+      <main>
         <Outlet />
       </main>
     </ClerkProvider>
