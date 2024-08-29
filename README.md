@@ -1,4 +1,4 @@
-# shoppr
+# shoppr [This Project Is Not Finished]
 
 A full stack React project for users who want to group co-op buy groceries and save money.
 
