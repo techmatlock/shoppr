@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import RootLayout from "./layouts/root-layout";
-import { IndexPage } from "./routes";
-import SignInPage from "./routes/sign-in";
-import SignUpPage from "./routes/sign-up";
-import { NotFoundPage } from "./routes/not-found";
+import { SignInPage } from "./pages/sign-in";
+import { SignUpPage } from "./pages/sign-up";
+import { NotFoundPage } from "./pages/not-found";
+import { IndexPage } from "./pages";
 
 const router = createBrowserRouter([
   {
