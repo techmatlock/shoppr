@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { FaCartShopping } from "react-icons/fa6";
 
 export default function RootLayout() {
