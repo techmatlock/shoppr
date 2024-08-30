@@ -28,13 +28,6 @@ if (!hashKey) throw new Error("TOKEN_SECRET not found in .env");
 
 const app = express();
 
-// Create paths for static directories
-const reactStaticDir = new URL("../client/dist", import.meta.url).pathname;
-const uploadsStaticDir = new URL("public", import.meta.url).pathname;
-
-app.use(express.static(reactStaticDir));
-// Static directory for file uploads server/public/
-app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
 app.post("/api/auth/sign-up", async (req, res, next) => {
@@ -94,12 +87,18 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
   }
 });
 
-/*
- * Handles paths that aren't handled by any other route handler.
- * It responds with `index.html` to support page refreshes with React Router.
- * This must be the _last_ route, just before errorMiddleware.
- */
-app.get("*", (req, res) => res.sendFile(`${reactStaticDir}/index.html`));
+app.get("/api/users", async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "users"
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.use(errorMiddleware);
 
