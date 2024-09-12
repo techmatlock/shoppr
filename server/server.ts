@@ -11,6 +11,7 @@ type User = {
   username: string;
   hashedPassword: string;
 };
+
 type Auth = {
   username: string;
   password: string;
@@ -18,9 +19,6 @@ type Auth = {
 
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
 });
 
 const hashKey = process.env.TOKEN_SECRET;
@@ -41,7 +39,7 @@ app.post("/api/auth/sign-up", async (req, res, next) => {
     const sql = `
       insert into "users" ("username", "hashedPassword")
         values ($1, $2)
-        returning "userId", "username", "createdAt";
+        returning "userId", "username";
     `;
 
     const params = [username, hashedPassword];
@@ -93,7 +91,7 @@ app.get("/api/users", async (req, res, next) => {
     select *
         from "users"
     `;
-    const result = await db.query(sql);
+    const result = await db.query<User>(sql);
     res.json(result.rows);
   } catch (err) {
     next(err);
