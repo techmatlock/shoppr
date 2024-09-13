@@ -1,8 +1,10 @@
+drop schema "public" cascade;
+
 create schema "public";
 
 CREATE TABLE "users" (
   "userId" serial PRIMARY KEY,
-  "username" text UNIQUE,
+  "username" text,
   "hashedPassword" text,
   "createdAt" timestamp NOT NULL DEFAULT (now())
 );
