@@ -8,6 +8,9 @@ import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "@/context/useUser";
+import { User } from "@/lib/data";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   username: z.string().min(5, {
@@ -18,8 +21,21 @@ const formSchema = z.object({
   }),
 });
 
+type AuthData = {
+  user: User;
+  token: string;
+};
+
 export function SignInPage() {
   const navigate = useNavigate();
+  const { handleSignIn, user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,17 +48,20 @@ export function SignInPage() {
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       const req = {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(values),
       };
-      const res = await fetch("/api/auth/sign-up", req);
+      const res = await fetch("/api/auth/sign-in", req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
-      return res.json();
+      const { user, token } = (await res.json()) as AuthData;
+      handleSignIn(user, token);
+      navigate("/");
     },
     onSuccess: () => {
-      alert(`Successfully signed in`);
       navigate("/");
     },
     onError: (err: Error) => {
