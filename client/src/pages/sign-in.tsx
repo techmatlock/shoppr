@@ -7,7 +7,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../com
 import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/context/useUser";
 import { User } from "@/lib/data";
 import { useEffect } from "react";
@@ -65,7 +65,7 @@ export function SignInPage() {
       navigate("/");
     },
     onError: (err: Error) => {
-      alert(`Error signing up: ${err.message}`);
+      alert(`Error signing in: ${err.message}`);
     },
   });
 
@@ -111,7 +111,12 @@ export function SignInPage() {
           </div>
         </form>
       </FormProvider>
-      <p className="mt-4">Don't have an account? Register here</p>
+      <p className="mt-4">
+        Don't have an account? Register{" "}
+        <Link className="text-blue-400 underline" to={"/sign-up"}>
+          here
+        </Link>
+      </p>
     </div>
   );
 }
