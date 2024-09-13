@@ -18,9 +18,11 @@ type Auth = {
 };
 
 type ShoppingItems = {
+  shoppingItemId: number;
   title: string;
   status: string;
   userId: number;
+  groupId: number;
 };
 
 const db = new pg.Pool({
@@ -86,6 +88,21 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
     } else {
       throw new ClientError(401, "Invalid login");
     }
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/shoppingItems", async (req, res, next) => {
+  try {
+    const sql = `
+          select *
+            from "shoppingItems"
+            order by "shoppingItemId" desc;
+      `;
+    const result = await db.query(sql);
+    if (!result) throw new ClientError(401, "Failed to create shopping item.");
+    res.json(result.rows);
   } catch (err) {
     next(err);
   }
