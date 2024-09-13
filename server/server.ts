@@ -17,6 +17,12 @@ type Auth = {
   password: string;
 };
 
+type ShoppingItems = {
+  title: string;
+  status: string;
+  userId: number;
+};
+
 const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -85,14 +91,22 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
   }
 });
 
-app.get("/api/users", async (req, res, next) => {
+app.post("/api/shoppingItems", async (req, res, next) => {
   try {
+    const { title, status, userId } = req.body as ShoppingItems;
+    if (!title || !status || !userId) {
+      throw new ClientError(401, "title, status, userId are required.");
+    }
     const sql = `
-    select *
-        from "users"
+        insert into "shoppingItems" ("title", "status", "userId")
+        values ($1, $2, $3)
+        returning *;
     `;
-    const result = await db.query<User>(sql);
-    res.json(result.rows);
+    const params = [title, status, userId];
+    const result = await db.query(sql, params);
+    if (!result) throw new ClientError(401, "Failed to create shopping item.");
+    const [item] = result.rows;
+    res.status(201).json(item);
   } catch (err) {
     next(err);
   }

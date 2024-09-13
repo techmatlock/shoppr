@@ -1,3 +1,5 @@
+set client_min_messages to warning;
+
 drop schema "public" cascade;
 
 create schema "public";
@@ -12,9 +14,9 @@ CREATE TABLE "users" (
 CREATE TABLE "shoppingItems" (
   "shoppingItemId" serial PRIMARY KEY,
   "title" text,
-  "status" text,
+  "status" text DEFAULT 'pending',
   "userId" integer,
-  "groupId" integer,
+  "groupId" integer DEFAULT NULL,
   "createdAt" timestamp NOT NULL DEFAULT (now())
 );
 
