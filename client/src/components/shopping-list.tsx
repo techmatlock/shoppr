@@ -1,20 +1,21 @@
-import { shoppingList } from "../lib/placeholder-data.ts";
+import { useItems } from "@/context/useItems.tsx";
 
 type Props = {
   isMobile: boolean;
 };
 
 export function ShoppingList({ isMobile }: Props) {
+  const { items } = useItems();
+
   return (
     <>
       <div className="grid grid-cols-1 grid-flow-col md:grid-cols-4 items-center gap-8 my-6">
         <p>Item</p>
         <p>Status</p>
         <p>Needed By</p>
-        <p>I Want</p>
       </div>
       <ul>
-        {shoppingList.map((item) => (
+        {items?.map((item) => (
           <li key={item.shoppingItemId} className="grid grid-cols-1 grid-flow-col md:grid-cols-4 items-center my-6 border-b-2">
             <div>{item.title}</div>
             <div>
@@ -35,7 +36,7 @@ export function ShoppingList({ isMobile }: Props) {
       </ul>
       <h1 className="text-lg">Completed</h1>
       <ul>
-        {shoppingList.map((item) => (
+        {items?.map((item) => (
           <li key={item.shoppingItemId} className="grid grid-cols-1 grid-flow-col md:grid-cols-4 items-center my-6 border-b-2 opacity-50">
             <div className="opacity-50">{item.title}</div>
             <div className="opacity-50">
