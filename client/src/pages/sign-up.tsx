@@ -98,7 +98,7 @@ export function SignUpPage() {
               <FormItem>
                 <FormLabel className="text-black">Password</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} type={"password"} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

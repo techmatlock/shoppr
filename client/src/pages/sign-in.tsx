@@ -79,7 +79,7 @@ export function SignInPage() {
               <FormItem>
                 <FormLabel className="text-black">Password</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} type={"password"} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
