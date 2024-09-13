@@ -6,6 +6,9 @@ import { z } from "zod";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { User } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(8, {
@@ -20,6 +23,8 @@ const formSchema = z.object({
 });
 
 export function SignUpPage() {
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,9 +34,32 @@ export function SignUpPage() {
     },
   });
 
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const req = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      };
+      const res = await fetch("/api/auth/sign-up", req);
+      if (!res.ok) {
+        throw new Error(`fetch Error ${res.status}`);
+      }
+      return res.json();
+    },
+    onSuccess: (user: User) => {
+      alert(`Successfully registered ${user.username}.`);
+      navigate("/sign-in");
+    },
+    onError: (err: Error) => {
+      alert(`Error signing up: ${err.message}`);
+    },
+  });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    mutation.mutate(values);
   }
+
   return (
     <div className="flex flex-col items-center mt-12">
       <h1 className="text-2xl mb-4">Register</h1>
