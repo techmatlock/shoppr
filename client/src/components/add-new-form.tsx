@@ -1,27 +1,33 @@
+import { useItems } from "@/context/useItems";
+import { useUser } from "@/context/useUser";
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent } from "react";
 
 export function AddNewForm() {
+  const { fetchItems } = useItems();
+  const { user, token } = useUser();
   const mutation = useMutation({
     mutationFn: async (shoppingItem: string) => {
       const newPost = {
         title: shoppingItem,
         status: "pending",
-        userId: 1,
+        userId: user?.userId,
       };
       const req = {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(newPost),
       };
       const res = await fetch("/api/shoppingItems", req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
-      return res.json();
     },
     onSuccess: () => {
-      alert("Successfully created shopping item.");
+      fetchItems();
     },
     onError: (err: Error) => {
       alert(`Failed to create shopping item: ${err.message}`);

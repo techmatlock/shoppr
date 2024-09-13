@@ -9,6 +9,7 @@ import { SignUpPage } from "./pages/sign-up";
 import { NotFoundPage } from "./pages/not-found";
 import { IndexPage } from "./pages";
 import { ItemsProvider } from "./context/ItemsContext";
+import { UserProvider } from "./context/UserContext";
 
 const queryClient = new QueryClient();
 
@@ -27,9 +28,11 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ItemsProvider>
-        <RouterProvider router={router} />
-      </ItemsProvider>
+      <UserProvider>
+        <ItemsProvider>
+          <RouterProvider router={router} />
+        </ItemsProvider>
+      </UserProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

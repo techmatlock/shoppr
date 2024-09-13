@@ -42,6 +42,19 @@ app.post("/api/auth/sign-up", async (req, res, next) => {
     if (!username || !password) {
       throw new ClientError(400, "username and password are required fields");
     }
+
+    // Check if the username already exists
+    const checkUserSql = `
+        select "username"
+            from "users"
+            where "username" = $1
+    `;
+    const prams = [username];
+    const checkUserResult = await db.query(checkUserSql, prams);
+    if (checkUserResult.rows.length > 0) {
+      throw new ClientError(409, "Username already exists");
+    }
+
     const hashedPassword = await argon2.hash(password);
 
     const sql = `
@@ -89,7 +102,12 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
       throw new ClientError(401, "Invalid login");
     }
   } catch (err) {
-    next(err);
+    // Catching duplicate key error
+    if (err.code === "23505") {
+      next(new ClientError(409, "Username already exists"));
+    } else {
+      next(err);
+    }
   }
 });
 
@@ -108,7 +126,7 @@ app.get("/api/shoppingItems", async (req, res, next) => {
   }
 });
 
-app.post("/api/shoppingItems", async (req, res, next) => {
+app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   try {
     const { title, status, userId } = req.body as ShoppingItems;
     if (!title || !status || !userId) {

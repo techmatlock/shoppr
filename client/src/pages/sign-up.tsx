@@ -8,7 +8,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { User } from "@/context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   name: z.string().min(8, {
@@ -47,12 +47,11 @@ export function SignUpPage() {
       }
       return res.json();
     },
-    onSuccess: (user: User) => {
-      alert(`Successfully registered ${user.username}.`);
+    onSuccess: () => {
       navigate("/sign-in");
     },
-    onError: (err: Error) => {
-      alert(`Error signing up: ${err.message}`);
+    onError: () => {
+      alert(`Username already exists`);
     },
   });
 
@@ -111,7 +110,12 @@ export function SignUpPage() {
           </div>
         </form>
       </FormProvider>
-      <p className="mt-4">Already have an account? Login here</p>
+      <p className="mt-4">
+        Already have an account? Login{" "}
+        <Link className="text-blue-400 underline" to={"/sign-in"}>
+          here
+        </Link>
+      </p>
     </div>
   );
 }
