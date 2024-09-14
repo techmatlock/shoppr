@@ -80,8 +80,7 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
     }
 
     const sql = `
-      select "userId",
-             "hashedPassword"
+      select *
         from "users"
         where "username" = $1
     `;
@@ -89,11 +88,12 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
     const result = await db.query(sql, params);
     if (!result) throw new ClientError(401, `User ${username} was not found`);
 
-    const { userId, hashedPassword } = result.rows[0];
+    const { userId, name, hashedPassword } = result.rows[0];
 
     if (await argon2.verify(hashedPassword, password)) {
       const payload = {
         userId,
+        name,
         username,
       };
       const token = jwt.sign(payload, hashKey);

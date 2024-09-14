@@ -3,6 +3,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 
 export type User = {
   userId: number;
+  name: string;
   username: string;
 };
 
@@ -11,7 +12,7 @@ export type UserContextValues = {
   token: string | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
-  getInitials: (user: { name: string }) => void;
+  getInitials: (user: { name: string }) => string;
 };
 
 export const UserContext = createContext<UserContextValues>({
@@ -19,7 +20,7 @@ export const UserContext = createContext<UserContextValues>({
   token: undefined,
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
-  getInitials: () => undefined,
+  getInitials: () => "",
 });
 
 type Props = {
