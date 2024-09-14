@@ -13,7 +13,7 @@ export function DropDownMenu() {
     <div>
       <button onClick={handleClick}>
         <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-gray-300 rounded-full dark:bg-gray-600">
-          <span className="font-medium text-gray-600 dark:text-gray-300">{user?.name}</span>
+          <span className="font-medium text-gray-600 dark:text-gray-300">LL</span>
         </div>
       </button>
       {isOpen && (
