@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { FaCartShopping } from "react-icons/fa6";
+import { DropDownMenu } from "@/components/dropdown-menu";
 
 export default function RootLayout() {
   return (
@@ -8,6 +9,9 @@ export default function RootLayout() {
         <div className="flex items-center">
           <FaCartShopping className="text-green-500 w-full text-xl" />
           <p className="pl-2 text-md">shoppr</p>
+        </div>
+        <div className="flex items-center">
+          <DropDownMenu />
         </div>
       </header>
       <main>
