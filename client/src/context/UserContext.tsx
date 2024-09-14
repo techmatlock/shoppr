@@ -3,6 +3,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 
 export type User = {
   userId: number;
+  name: string;
   username: string;
 };
 
@@ -11,6 +12,7 @@ export type UserContextValues = {
   token: string | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
+  getInitials: (user: { name: string }) => string;
 };
 
 export const UserContext = createContext<UserContextValues>({
@@ -18,6 +20,7 @@ export const UserContext = createContext<UserContextValues>({
   token: undefined,
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
+  getInitials: () => "",
 });
 
 type Props = {
@@ -45,6 +48,16 @@ export function UserProvider({ children }: Props) {
     removeAuth();
   }
 
-  const contextValue = { user, token, handleSignIn, handleSignOut };
+  function getInitials(user: { name: string }): string {
+    if (!user || !user.name) return "";
+    const words = user?.name?.split(" ");
+    if (words && words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    } else {
+      return words[0][0].toUpperCase() || "";
+    }
+  }
+
+  const contextValue = { user, token, handleSignIn, handleSignOut, getInitials };
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }

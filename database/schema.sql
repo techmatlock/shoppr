@@ -6,6 +6,7 @@ create schema "public";
 
 CREATE TABLE "users" (
   "userId" serial PRIMARY KEY,
+  "name" text,
   "username" text UNIQUE,
   "hashedPassword" text,
   "createdAt" timestamp NOT NULL DEFAULT (now())

@@ -8,6 +8,7 @@ export type ShoppingItems = {
 
 export type User = {
   userId: number;
+  name: string;
   username: string;
 };
 

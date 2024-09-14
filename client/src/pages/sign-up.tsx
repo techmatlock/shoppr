@@ -7,7 +7,6 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../com
 import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
-import { User } from "@/context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
