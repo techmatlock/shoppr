@@ -6,6 +6,11 @@ export type ShoppingItems = {
   groupId: number;
 };
 
+export type NeededBy = {
+  userId: number;
+  shoppingItemId: number;
+};
+
 export type User = {
   userId: number;
   name: string;
@@ -48,4 +53,15 @@ export async function getItems(): Promise<ShoppingItems[]> {
   });
   if (!res.ok) throw new Error(`Response status: ${res.status}`);
   return (await res.json()) as ShoppingItems[];
+}
+
+// Get all users that requested they need the shopping item
+export async function getNeededBy(): Promise<NeededBy[]> {
+  const res = await fetch("/api/neededBy", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`Response status: ${res.status}`);
+  return (await res.json()) as NeededBy[];
 }
