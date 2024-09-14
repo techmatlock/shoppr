@@ -147,6 +147,19 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   }
 });
 
+app.get("/api/neededBy", authMiddleware, async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "neededBy"
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
