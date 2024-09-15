@@ -1,11 +1,13 @@
 import { getItems, getNeededBy, NeededBy, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
+import { useUser } from "./useUser";
 
 export type ItemsContextValues = {
   items: ShoppingItems[] | undefined;
   neededBy: NeededBy[] | undefined;
   getItems: () => void;
   fetchItems: () => void;
+  removeShopItem: (itemId: number) => void;
 };
 
 export const ItemsContext = createContext<ItemsContextValues>({
@@ -13,6 +15,7 @@ export const ItemsContext = createContext<ItemsContextValues>({
   neededBy: undefined,
   getItems: () => undefined,
   fetchItems: () => undefined,
+  removeShopItem: () => undefined,
 });
 
 type Props = {
@@ -22,6 +25,7 @@ type Props = {
 export function ItemsProvider({ children }: Props) {
   const [items, setItems] = useState<ShoppingItems[]>([]);
   const [neededBy, setNeededBy] = useState<NeededBy[]>([]);
+  const { token } = useUser();
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {
@@ -57,6 +61,25 @@ export function ItemsProvider({ children }: Props) {
     }
   }
 
+  // Updates shopping item status from pending to completed
+  async function removeShopItem(itemId: number) {
+    try {
+      const res = await fetch(`/api/shoppingItems/${itemId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemId }),
+      });
+      if (!res.ok) throw new Error(`Response status: ${res.status}`);
+      const data = (await res.json()) as ShoppingItems[];
+      setItems(data);
+    } catch (error) {
+      setError(error);
+    }
+  }
+
   if (error) {
     return <div>Error! {error instanceof Error ? error.message : "Unknown error"}</div>;
   }
@@ -66,6 +89,7 @@ export function ItemsProvider({ children }: Props) {
     neededBy,
     getItems,
     fetchItems,
+    removeShopItem,
   };
 
   return <ItemsContext.Provider value={contextValue}>{children}</ItemsContext.Provider>;
