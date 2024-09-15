@@ -3,6 +3,8 @@ export type ShoppingItems = {
   title: string;
   status: string;
   userId: number;
+  name: string;
+  username: string;
   groupId: number;
 };
 
@@ -55,7 +57,7 @@ export async function getItems(): Promise<ShoppingItems[]> {
   return (await res.json()) as ShoppingItems[];
 }
 
-// Get all users that requested they need the shopping item
+// Get users that requested they need the shopping item
 export async function getNeededBy(): Promise<NeededBy[]> {
   const res = await fetch("/api/neededBy", {
     headers: {
