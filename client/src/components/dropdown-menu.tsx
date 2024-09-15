@@ -5,11 +5,6 @@ import { Link } from "react-router-dom";
 export function DropDownMenu() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { user, getInitials, handleSignOut } = useUser();
-  let initials = "";
-
-  if (user) {
-    initials = getInitials(user);
-  }
 
   function handleClick() {
     setIsOpen(!isOpen);
@@ -19,7 +14,7 @@ export function DropDownMenu() {
     <div>
       <button onClick={handleClick}>
         <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-gray-300 rounded-full dark:bg-gray-600">
-          <span className="font-medium text-gray-600 dark:text-gray-300">{initials}</span>
+          <span className="font-medium text-gray-600 dark:text-gray-300">{user && getInitials(user.name)}</span>
         </div>
       </button>
       {isOpen && (
