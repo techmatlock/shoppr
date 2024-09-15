@@ -1,14 +1,16 @@
-import { getItems, ShoppingItems } from "@/lib/data";
+import { getItems, getNeededBy, NeededBy, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
 
 export type ItemsContextValues = {
   items: ShoppingItems[] | undefined;
+  neededBy: NeededBy[] | undefined;
   getItems: () => void;
   fetchItems: () => void;
 };
 
 export const ItemsContext = createContext<ItemsContextValues>({
   items: undefined,
+  neededBy: undefined,
   getItems: () => undefined,
   fetchItems: () => undefined,
 });
@@ -19,6 +21,7 @@ type Props = {
 
 export function ItemsProvider({ children }: Props) {
   const [items, setItems] = useState<ShoppingItems[]>([]);
+  const [neededBy, setNeededBy] = useState<NeededBy[]>([]);
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {
@@ -31,6 +34,18 @@ export function ItemsProvider({ children }: Props) {
       }
     }
     loadPosts();
+  }, []);
+
+  useEffect(() => {
+    async function loadNeededBy() {
+      try {
+        const needed = await getNeededBy();
+        setNeededBy(needed);
+      } catch (error) {
+        setError(error);
+      }
+    }
+    loadNeededBy();
   }, []);
 
   async function fetchItems() {
@@ -48,6 +63,7 @@ export function ItemsProvider({ children }: Props) {
 
   const contextValue = {
     items,
+    neededBy,
     getItems,
     fetchItems,
   };
