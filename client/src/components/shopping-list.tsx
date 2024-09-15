@@ -1,5 +1,7 @@
 import { useItems } from "@/context/useItems.tsx";
 import { useUser } from "@/context/useUser";
+import { removeItem, ShoppingItems } from "@/lib/data";
+import { useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -10,6 +12,20 @@ type Props = {
 export function ShoppingList({ isMobile }: Props) {
   const { items, neededBy } = useItems();
   const { user, getInitials } = useUser();
+  const [error, setError] = useState<unknown>();
+  const [completed, setCompleted] = useState<ShoppingItems[]>([]);
+
+  // Work on adding the rendering in the JSX for the completed list that state is set in this function
+  // Add a conditional so that only pending status items are added in the top list.
+  async function handleRemoveItem(itemId: number) {
+    try {
+      const data = await removeItem(itemId);
+      const completedItems = data.filter((item) => item.status === "completed");
+      setCompleted(completedItems);
+    } catch (error) {
+      setError(error);
+    }
+  }
 
   return (
     <>
@@ -40,7 +56,7 @@ export function ShoppingList({ isMobile }: Props) {
               </div>
             )}
             <div className="flex items-center justify-center space-x-2">
-              <button>{item.userId === user?.userId ? <FaRegTrashAlt className="text-2xl text-red-400" /> : <IoMdAddCircleOutline className="text-3xl text-green-500" />}</button>
+              <button>{item.userId === user?.userId ? <FaRegTrashAlt onClick={() => handleRemoveItem(item.shoppingItemId)} className="text-2xl text-red-400" /> : <IoMdAddCircleOutline className="text-3xl text-green-500" />}</button>
             </div>
           </li>
         ))}
