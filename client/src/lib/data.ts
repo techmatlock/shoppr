@@ -10,6 +10,7 @@ export type ShoppingItems = {
 
 export type NeededBy = {
   userId: number;
+  name: string;
   shoppingItemId: number;
 };
 
