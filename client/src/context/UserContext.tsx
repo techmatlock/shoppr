@@ -12,7 +12,7 @@ export type UserContextValues = {
   token: string | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
-  getInitials: (user: { name: string }) => string;
+  getInitials: (name: string) => string;
 };
 
 export const UserContext = createContext<UserContextValues>({
@@ -48,9 +48,9 @@ export function UserProvider({ children }: Props) {
     removeAuth();
   }
 
-  function getInitials(user: { name: string }): string {
-    if (!user || !user.name) return "";
-    const words = user?.name?.split(" ");
+  function getInitials(name: string): string {
+    if (!name) return "";
+    const words = name.split(" ");
     if (words && words.length >= 2) {
       return (words[0][0] + words[1][0]).toUpperCase();
     } else {
