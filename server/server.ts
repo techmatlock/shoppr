@@ -116,6 +116,7 @@ app.get("/api/shoppingItems", async (req, res, next) => {
     const sql = `
           select *
             from "shoppingItems"
+            join "users" using ("userId")
             order by "shoppingItemId" desc;
       `;
     const result = await db.query(sql);
@@ -147,11 +148,12 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   }
 });
 
-app.get("/api/neededBy", authMiddleware, async (req, res, next) => {
+app.get("/api/neededBy", async (req, res, next) => {
   try {
     const sql = `
     select *
         from "neededBy"
+        join "users" using ("userId")
     `;
     const result = await db.query(sql);
     res.json(result.rows);
