@@ -1,5 +1,7 @@
 import { useItems } from "@/context/useItems.tsx";
 import { useUser } from "@/context/useUser";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 type Props = {
   isMobile: boolean;
@@ -7,7 +9,7 @@ type Props = {
 
 export function ShoppingList({ isMobile }: Props) {
   const { items, neededBy } = useItems();
-  const { getInitials } = useUser();
+  const { user, getInitials } = useUser();
 
   return (
     <>
@@ -30,15 +32,15 @@ export function ShoppingList({ isMobile }: Props) {
                 </div>
                 {neededBy
                   ?.filter((needed) => item.shoppingItemId === needed.shoppingItemId)
-                  .map((needed) => (
-                    <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
+                  .map((needed, index) => (
+                    <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
                       <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
                     </div>
                   ))}
               </div>
             )}
             <div className="flex items-center justify-center space-x-2">
-              <button className="h-10 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90">Need</button>
+              <button>{item.userId === user?.userId ? <FaRegTrashAlt className="text-2xl text-red-400" /> : <IoMdAddCircleOutline className="text-3xl text-green-500" />}</button>
             </div>
           </li>
         ))}
