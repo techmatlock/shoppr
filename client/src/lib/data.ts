@@ -68,14 +68,3 @@ export async function getNeededBy(): Promise<NeededBy[]> {
   if (!res.ok) throw new Error(`Response status: ${res.status}`);
   return (await res.json()) as NeededBy[];
 }
-
-// Returns all the shopping items including status `completed`
-export async function removeItem(itemId: number): Promise<ShoppingItems[]> {
-  const res = await fetch(`/api/shoppingItems/${itemId}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as ShoppingItems[];
-}
