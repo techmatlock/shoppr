@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Remove when used */
 import "dotenv/config";
-import express, { application } from "express";
-import pg, { Client, DatabaseError } from "pg";
+import express from "express";
+import pg from "pg";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { authMiddleware, ClientError, errorMiddleware } from "./lib/index.js";
@@ -143,6 +143,31 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
     if (!result) throw new ClientError(401, "Failed to create shopping item.");
     const [item] = result.rows;
     res.status(201).json(item);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Updates shopping item status from pending to completed
+app.put("/api/shoppingItems/:itemId", authMiddleware, async (req, res, next) => {
+  try {
+    const { shoppingItemId } = req.body as ShoppingItems;
+    if (!shoppingItemId) throw new ClientError(400, "shoppingItemId required");
+    const sqlStatusUpdate = `
+    update "shoppingItems"
+        set "status"= $1
+        where "shoppingItemId" = $2;
+    `;
+    const params = ["completed", shoppingItemId];
+    await db.query(sqlStatusUpdate, params);
+    const sql = `
+    select *
+      from "shoppingItems"
+      join "users" using ("userId")
+      order by "shoppingItemId" desc;
+      `;
+    const result = await db.query(sql);
+    res.json(result.rows);
   } catch (err) {
     next(err);
   }
