@@ -148,18 +148,17 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   }
 });
 
-// Updates shopping item status from pending to completed
 app.put("/api/shoppingItems/:itemId", authMiddleware, async (req, res, next) => {
   try {
-    const { shoppingItemId } = req.body as ShoppingItems;
-    if (!shoppingItemId) throw new ClientError(400, "shoppingItemId required");
+    const { itemId } = req.params;
+    if (!itemId) throw new ClientError(400, "itemId required");
     const sqlStatusUpdate = `
     update "shoppingItems"
         set "status"= $1
         where "shoppingItemId" = $2;
     `;
-    const params = ["completed", shoppingItemId];
-    await db.query(sqlStatusUpdate, params);
+    const params = ["completed", itemId];
+    await db.query(sqlStatusUpdate, params); // Updates shopping item status from pending to completed
     const sql = `
     select *
       from "shoppingItems"
