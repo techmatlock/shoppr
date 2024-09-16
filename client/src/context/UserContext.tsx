@@ -1,15 +1,11 @@
-import { readToken, readUser, removeAuth, saveAuth } from "@/lib/data";
+import { getShopper, getUsers, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "@/lib/data";
 import { createContext, ReactNode, useEffect, useState } from "react";
-
-export type User = {
-  userId: number;
-  name: string;
-  username: string;
-};
 
 export type UserContextValues = {
   user: User | undefined;
+  users: User[] | undefined;
   token: string | undefined;
+  shopper: Shopper | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
   getInitials: (name: string) => string;
@@ -17,7 +13,9 @@ export type UserContextValues = {
 
 export const UserContext = createContext<UserContextValues>({
   user: undefined,
+  users: undefined,
   token: undefined,
+  shopper: undefined,
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
   getInitials: () => "",
@@ -29,11 +27,38 @@ type Props = {
 
 export function UserProvider({ children }: Props) {
   const [user, setUser] = useState<User>();
+  const [users, setUsers] = useState<User[]>([]);
+  const [shopper, setShopper] = useState<Shopper>();
   const [token, setToken] = useState<string>();
+  const [error, setError] = useState<unknown>();
 
   useEffect(() => {
     setUser(readUser());
     setToken(readToken());
+  }, []);
+
+  useEffect(() => {
+    async function loadShopper() {
+      try {
+        const data = await getShopper();
+        setShopper(data);
+      } catch (error) {
+        setError(error);
+      }
+    }
+    loadShopper();
+  }, []);
+
+  useEffect(() => {
+    async function getAllUsers() {
+      try {
+        const data = await getUsers();
+        setUsers(data);
+      } catch (error) {
+        setError(error);
+      }
+    }
+    getAllUsers();
   }, []);
 
   function handleSignIn(user: User, token: string) {
@@ -58,6 +83,10 @@ export function UserProvider({ children }: Props) {
     }
   }
 
-  const contextValue = { user, token, handleSignIn, handleSignOut, getInitials };
+  if (error) {
+    return <div>Error! {error instanceof Error ? error.message : "Unknown error"}</div>;
+  }
+
+  const contextValue = { user, users, token, shopper, undefined, handleSignIn, handleSignOut, getInitials };
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
