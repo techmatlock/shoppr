@@ -1,6 +1,6 @@
-# shoppr [This Project Is Not Finished]
+# shoppr
 
-A full stack React project for users who want to group co-op buy groceries and save money.
+A full stack React project for users who want to group buy groceries in bulk and split the costs to save money.
 
 ## Table of Contents
 
@@ -25,22 +25,22 @@ A full stack React project for users who want to group co-op buy groceries and s
 ## Features
 
 - Users can register and login
-- Users can create posts
-- Users can upvote or downvote posts
-- Users can comment on posts
-- Users can filter posts by categories
+- Users can shopping items
+- Users can remove or add themselves to the needed list for each shopping item
+- Users can elect themselves to be the current shopper
 
 ## Preview
 
 ## Installation
 
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/your-username/your-repo-name.git
-    ```
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
+   ```
 2. Navigate to the project directory:
-    ```bash
-    cd your-repo-name
+   ```bash
+   cd your-repo-name
+   ```
 3. Install all dependencies with `npm install`.
 
 #### Create the database
@@ -63,25 +63,16 @@ If your project will _not_ be using a database, edit `package.json` to remove th
 
 #### Start the development servers
 
-1. Start all the development servers with the `"dev"` script:
+1. In both the `client` and `server` folders, start the development servers using:
    ```sh
    npm run dev
    ```
 1. Later, when you wish to stop the development servers, type `Ctrl-C` in the terminal where the servers are running.
 
-#### Verify the client
-
-1. A React app has already been created for you.
-1. Take a minute to look over the code in `client/src/App.tsx` to get an idea of what it is doing.
-1. Go to the app in your browser. You should see the message from the server below the React logo, and in the browser console.
-   ![](md.assets/client-server.png)
-1. If you see the message from the server in your browser you are good to go, your client and server are communicating.
-
 #### Set up the database
 
 1. In your browser navigate to the site you used for your database design.
 1. Export your database as PostgreSQL, this should generate the SQL code for creating your database tables.
-   - Reach out to an instructor if you have any issues with this step
 1. Copy the generated SQL code and paste it into `database/schema.sql` below the preexisting sql code in the file. The end result should look something like: _(You will likely have more tables)_
 
    ```SQL
@@ -102,8 +93,7 @@ If your project will _not_ be using a database, edit `package.json` to remove th
    );
    ```
 
-1. In a separate terminal, run `npm run db:import` to create your tables
-1. Use `psql` to verify your tables were created successfully (see [LFZ Database Guide](https://lms.learningfuze.com/code-guides/Learning-Fuze/curriculum/database) for tips). Your database and tables should be listed; if not, stop here and reach out to an instructor for help
+1. In a separate terminal, run `psql -d <databasebaseUrl> -f data.sql schema.sql` to create your tables
 1. At this point your database is setup and you are good to start using it. However there is no data in your database, which isn't necessarily a bad thing, but if you want some starting data in your database you need to add insert statements into the `database/data.sql` file. You can add whatever starting data you need/want. Here is an example:
    ```SQL
    insert into "todos" ("task", "isCompleted")
@@ -112,34 +102,10 @@ If your project will _not_ be using a database, edit `package.json` to remove th
        ('Build projects', false),
        ('Get a job', false);
    ```
-1. After any changes to `database/schema.sql` or `database/data.sql` re-run the `npm run db:import` command to update your database. Use `psql` to verify your changes were successfully applied.
+1. After any changes to `database/schema.sql` or `database/data.sql` re-run the `psql <databasebaseUrl> -f data.sql -f schema.sql` command to update your database. Use `psql` to verify your changes were successfully applied.
 
-### Available `npm` commands explained
-
-Below is an explanation of all included `npm` commands in the root `package.json`. Several are only used for deployment purposes and should not be necessary for development.
-
-1. `start`
-   - The `start` script starts the Node server in `production` mode, without any file watchers.
-1. `build`
-   - The `build` script executes `npm run build` in the context of the `client` folder. This builds your React app for production. This is used during deployment, and not commonly needed during development.
-1. `db:import`
-   - The `db:import` script executes `database/import.sh`, which executes the `database/schema.sql` and `database/data.sql` files to build and populate your database.
-1. `dev`
-   - Starts all the development servers.
-1. `lint`
-   - Runs ESLint against all the client and server code.
-1. Not directly used by developer
-   1. `install:*`
-   - These scripts install dependencies in the `client` and `server` folders, and copy `.env.example` to `.env` if it doesn't already exist.
-   1. `dev:*`
-   - These scripts start the individual development servers.
-   1. `lint:*`
-   - These scripts run lint in the client and server directories.
-   1. `postinstall`
-      - The `postinstall` script is automatically run when you run `npm install`. It is executed after the dependencies are installed. Specifically for this project the `postinstall` script is used to install the `client` and `server` dependencies.
-   1. `prepare`
-      - The `prepare` script is similar to `postinstall` — it is executed before `install`. Specifically for this project it is used to install `husky`.
-   1. `deploy`
-      - The `deploy` script is used to deploy the project by pushing the `main` branch to the `pub` branch, which triggers the GitHub Action that deploys the project.
-     
 ## Challenges Encountered
+
+1. Ran into a bug with my getInitials function in my UserContext. Originally I passed in the user object because I was only concerned with the logged in user and displaying the avatar dropdown menu. But, my shopping list also needed to call this function and pass in the owner name associated with the shopping item. So when I was calling getInitials(), my shopping list kept displaying the wrong owner name since it was using the current logged in user object which was not intended. I changed the parameter to accept a string, being a name instead.
+2. Since my shopping list had a button to update the needed by column, but the shopping list used a separate state than the needed by state I had to nest a second state in the JSX and filter the results to match the needed by shopping item id with the shopping item id for each list item. This was challenging because I had two separate POST and DELETE calls to the database and then I needed to update two different states which would cause the shopping list component to re-render.
+3. Another problem with the shopping list was I would click add to add myself to the needed by column, but I wasn't checking for an existing row if the user had already clicked on the button to add themselves as item needed. So the icon wasn't changing to a delete icon because the POST call wasn't checking to see if a row already existed. So I added a checkIfNeedExists function to return true or false and then if true, remove the current user from the database.

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Remove when used */
 import "dotenv/config";
-import express, { application } from "express";
-import pg, { Client, DatabaseError } from "pg";
+import express from "express";
+import pg from "pg";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { authMiddleware, ClientError, errorMiddleware } from "./lib/index.js";
@@ -67,8 +67,8 @@ app.post("/api/auth/sign-up", async (req, res, next) => {
     const result = await db.query<User>(sql, params);
     const [user] = result.rows;
     res.status(201).json(user);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -101,13 +101,8 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
     } else {
       throw new ClientError(401, "Invalid login");
     }
-  } catch (err) {
-    // Catching duplicate key error
-    if (err.code === "23505") {
-      next(new ClientError(409, "Username already exists"));
-    } else {
-      next(err);
-    }
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -116,13 +111,14 @@ app.get("/api/shoppingItems", async (req, res, next) => {
     const sql = `
           select *
             from "shoppingItems"
+            join "users" using ("userId")
             order by "shoppingItemId" desc;
       `;
     const result = await db.query(sql);
     if (!result) throw new ClientError(401, "Failed to create shopping item.");
     res.json(result.rows);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -142,8 +138,98 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
     if (!result) throw new ClientError(401, "Failed to create shopping item.");
     const [item] = result.rows;
     res.status(201).json(item);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// app.put("/api/shoppingItems/:itemId", authMiddleware, async (req, res, next) => {
+//   try {
+//     const { itemId } = req.params;
+//     if (!itemId) throw new ClientError(400, "itemId required");
+//     const sqlStatusUpdate = `
+//     update "shoppingItems"
+//         set "status"= $1
+//         where "shoppingItemId" = $2;
+//     `;
+//     const params = ["completed", itemId];
+//     await db.query(sqlStatusUpdate, params); // Updates shopping item status from pending to completed
+//     const sql = `
+//     select *
+//       from "shoppingItems"
+//       join "users" using ("userId")
+//       order by "shoppingItemId" desc;
+//       `;
+//     const result = await db.query(sql);
+//     res.json(result.rows);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+app.get("/api/neededBy", async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "neededBy"
+        join "users" using ("userId")
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/neededBy/:userId", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!Number.isInteger(+userId)) {
+      throw new ClientError(400, `userId ${userId} must be a number.`);
+    }
+    const { shoppingItemId } = req.body;
+    const addUserSql = `
+        insert into "neededBy" ("userId", "shoppingItemId")
+        values ($1, $2)
+        returning *;
+    `;
+    const params = [userId, shoppingItemId];
+    await db.query(addUserSql, params);
+    const getUsersSql = `
+    select *
+        from "neededBy"
+        join "users" using ("userId")
+    `;
+    const result = await db.query(getUsersSql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/neededBy/:userId", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!Number.isInteger(+userId)) {
+      throw new ClientError(400, `userId ${userId} must be a number.`);
+    }
+    const { shoppingItemId } = req.body;
+    const removeUserSql = `
+        delete from "neededBy"
+            where "userId" = $1
+            and "shoppingItemId" = $2;
+      `;
+    const params = [userId, shoppingItemId];
+    await db.query(removeUserSql, params);
+    const getUsersSql = `
+      select *
+          from "neededBy"
+          join "users" using ("userId")
+      `;
+    const result = await db.query(getUsersSql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
   }
 });
 
