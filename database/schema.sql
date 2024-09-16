@@ -22,7 +22,6 @@ CREATE TABLE "shoppingItems" (
 );
 
 CREATE TABLE "neededBy" (
-  "neededById" serial PRIMARY KEY,
   "userId" integer,
   "shoppingItemId" integer
 );
@@ -48,6 +47,8 @@ CREATE TABLE "groupMembers" (
 ALTER TABLE "shoppingItems" ADD FOREIGN KEY ("userId") REFERENCES "users" ("userId");
 
 ALTER TABLE "shoppingItems" ADD FOREIGN KEY ("groupId") REFERENCES "groups" ("groupId");
+
+ALTER TABLE "neededBy" ADD PRIMARY KEY ("userId", "shoppingItemId");
 
 ALTER TABLE "neededBy" ADD FOREIGN KEY ("userId") REFERENCES "users" ("userId");
 
