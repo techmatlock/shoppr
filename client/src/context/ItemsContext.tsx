@@ -7,7 +7,8 @@ export type ItemsContextValues = {
   neededBy: NeededBy[] | undefined;
   getItems: () => void;
   fetchItems: () => void;
-  removeShopItem: (itemId: number) => void;
+  removeNeededBy: (itemId: number, shoppingItemId: number) => void;
+  addNeededBy: (userId: number, shoppingItemId: number) => void;
 };
 
 export const ItemsContext = createContext<ItemsContextValues>({
@@ -15,7 +16,8 @@ export const ItemsContext = createContext<ItemsContextValues>({
   neededBy: undefined,
   getItems: () => undefined,
   fetchItems: () => undefined,
-  removeShopItem: () => undefined,
+  removeNeededBy: () => undefined,
+  addNeededBy: () => undefined,
 });
 
 type Props = {
@@ -61,20 +63,61 @@ export function ItemsProvider({ children }: Props) {
     }
   }
 
-  // Updates shopping item status from pending to completed
-  async function removeShopItem(itemId: number) {
+  // Adds user that clicked on need item to the neededBy table
+  async function addNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const res = await fetch(`/api/shoppingItems/${itemId}`, {
-        method: "PUT",
+      const existingNeed = await checkIfNeedExists(userId, shoppingItemId);
+      if (existingNeed) {
+        await removeNeededBy(userId, shoppingItemId);
+        return;
+      }
+      const res = await fetch(`/api/neededBy/${userId}`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ itemId }),
+        body: JSON.stringify({ userId, shoppingItemId }),
       });
       if (!res.ok) throw new Error(`Response status: ${res.status}`);
-      const data = (await res.json()) as ShoppingItems[];
-      setItems(data);
+      const data = (await res.json()) as NeededBy[];
+      setNeededBy(data);
+    } catch (error) {
+      setError(error);
+    }
+  }
+
+  async function removeNeededBy(userId: number, shoppingItemId: number) {
+    try {
+      const res = await fetch(`/api/neededBy/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, shoppingItemId }),
+      });
+      if (!res.ok) throw new Error(`Response status: ${res.status}`);
+      const data = (await res.json()) as NeededBy[];
+      setNeededBy(data);
+    } catch (error) {
+      setError(error);
+    }
+  }
+
+  async function checkIfNeedExists(userId: number, shoppingItemId: number) {
+    try {
+      const total: NeededBy[] = [];
+      neededBy.forEach((need) => {
+        if (need.userId === userId && need.shoppingItemId == shoppingItemId) {
+          total.push(need);
+        }
+      });
+      if (total.length >= 1) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       setError(error);
     }
@@ -89,7 +132,8 @@ export function ItemsProvider({ children }: Props) {
     neededBy,
     getItems,
     fetchItems,
-    removeShopItem,
+    removeNeededBy,
+    addNeededBy,
   };
 
   return <ItemsContext.Provider value={contextValue}>{children}</ItemsContext.Provider>;
