@@ -12,6 +12,16 @@ type User = {
   hashedPassword: string;
 };
 
+type NeededBy = {
+  userId: number;
+  shoppingItemId: number;
+};
+
+type Shopper = {
+  shopperId: number;
+  userId: number;
+};
+
 type Auth = {
   username: string;
   password: string;
@@ -106,6 +116,19 @@ app.post("/api/auth/sign-in", async (req, res, next) => {
   }
 });
 
+app.get("/api/users", async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "users"
+    `;
+    const result = await db.query<User>(sql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get("/api/shoppingItems", async (req, res, next) => {
   try {
     const sql = `
@@ -114,7 +137,7 @@ app.get("/api/shoppingItems", async (req, res, next) => {
             join "users" using ("userId")
             order by "shoppingItemId" desc;
       `;
-    const result = await db.query(sql);
+    const result = await db.query<ShoppingItems[]>(sql);
     if (!result) throw new ClientError(401, "Failed to create shopping item.");
     res.json(result.rows);
   } catch (error) {
@@ -124,7 +147,7 @@ app.get("/api/shoppingItems", async (req, res, next) => {
 
 app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   try {
-    const { title, status, userId } = req.body as ShoppingItems;
+    const { title, status, userId } = req.body;
     if (!title || !status || !userId) {
       throw new ClientError(401, "title, status, userId are required.");
     }
@@ -134,7 +157,7 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
         returning *;
     `;
     const params = [title, status, userId];
-    const result = await db.query(sql, params);
+    const result = await db.query<ShoppingItems>(sql, params);
     if (!result) throw new ClientError(401, "Failed to create shopping item.");
     const [item] = result.rows;
     res.status(201).json(item);
@@ -143,30 +166,6 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   }
 });
 
-// app.put("/api/shoppingItems/:itemId", authMiddleware, async (req, res, next) => {
-//   try {
-//     const { itemId } = req.params;
-//     if (!itemId) throw new ClientError(400, "itemId required");
-//     const sqlStatusUpdate = `
-//     update "shoppingItems"
-//         set "status"= $1
-//         where "shoppingItemId" = $2;
-//     `;
-//     const params = ["completed", itemId];
-//     await db.query(sqlStatusUpdate, params); // Updates shopping item status from pending to completed
-//     const sql = `
-//     select *
-//       from "shoppingItems"
-//       join "users" using ("userId")
-//       order by "shoppingItemId" desc;
-//       `;
-//     const result = await db.query(sql);
-//     res.json(result.rows);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
 app.get("/api/neededBy", async (req, res, next) => {
   try {
     const sql = `
@@ -174,7 +173,7 @@ app.get("/api/neededBy", async (req, res, next) => {
         from "neededBy"
         join "users" using ("userId")
     `;
-    const result = await db.query(sql);
+    const result = await db.query<NeededBy[]>(sql);
     res.json(result.rows);
   } catch (error) {
     next(error);
@@ -200,7 +199,7 @@ app.post("/api/neededBy/:userId", authMiddleware, async (req, res, next) => {
         from "neededBy"
         join "users" using ("userId")
     `;
-    const result = await db.query(getUsersSql);
+    const result = await db.query<User[]>(getUsersSql);
     res.json(result.rows);
   } catch (error) {
     next(error);
@@ -226,7 +225,43 @@ app.delete("/api/neededBy/:userId", authMiddleware, async (req, res, next) => {
           from "neededBy"
           join "users" using ("userId")
       `;
-    const result = await db.query(getUsersSql);
+    const result = await db.query<User[]>(getUsersSql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/shopper", async (req, res, next) => {
+  try {
+    const sql = `
+    select * 
+        from "shopper"
+    `;
+    const result = await db.query<Shopper>(sql);
+    const [shopper] = result.rows;
+    res.json(shopper);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) throw new ClientError(400, `userId ${userId} must be a number.`);
+    const sql = `
+    insert into "shopper" ("userId")
+        values ($1)
+        returning *;
+    `;
+    const params = [userId];
+    await db.query(sql, params);
+    const getShopperSql = `
+    select *
+        from "shopper"
+    `;
+    const result = await db.query<Shopper>(getShopperSql);
     res.json(result.rows);
   } catch (error) {
     next(error);
