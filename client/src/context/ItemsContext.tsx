@@ -45,8 +45,8 @@ export function ItemsProvider({ children }: Props) {
   useEffect(() => {
     async function loadNeededBy() {
       try {
-        const needed = await getNeededBy();
-        setNeededBy(needed);
+        const data = await getNeededBy();
+        setNeededBy(data);
       } catch (error) {
         setError(error);
       }
