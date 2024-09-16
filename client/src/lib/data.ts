@@ -20,6 +20,11 @@ export type User = {
   username: string;
 };
 
+export type Shopper = {
+  shopperId: number;
+  userId: number;
+};
+
 const authKey = "um.auth";
 
 type Auth = {
@@ -67,4 +72,24 @@ export async function getNeededBy(): Promise<NeededBy[]> {
   });
   if (!res.ok) throw new Error(`Response status: ${res.status}`);
   return (await res.json()) as NeededBy[];
+}
+
+export async function getShopper(): Promise<Shopper> {
+  const res = await fetch("/api/shopper", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`Response status: ${res.status}`);
+  return (await res.json()) as Shopper;
+}
+
+export async function getUsers(): Promise<User[]> {
+  const res = await fetch("/api/users", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`Response status: ${res.status}`);
+  return (await res.json()) as User[];
 }
