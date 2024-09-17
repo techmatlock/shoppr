@@ -8,10 +8,10 @@ export default function RootLayout() {
 
   return (
     <>
-      <header className="flex h-12 justify-between px-12">
+      <header className="flex h-12 justify-between px-12 mb-2">
         <div className="flex items-center">
-          <FaCartShopping className="text-green-500 w-full text-xl" />
-          <p className="pl-2 text-md">shoppr</p>
+          <FaCartShopping className="text-green-500 w-full text-2xl" />
+          <p className="pl-2 text-lg">shoppR</p>
         </div>
         {user && (
           <div className="flex items-center">
