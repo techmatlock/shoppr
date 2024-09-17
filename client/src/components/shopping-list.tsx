@@ -1,6 +1,7 @@
 import { useItems } from "@/context/useItems.tsx";
 import { useUser } from "@/context/useUser";
 import { getInitials } from "@/lib/data";
+import { useMutation } from "@tanstack/react-query";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -9,8 +10,37 @@ type Props = {
 };
 
 export function ShoppingList({ isMobile }: Props) {
-  const { items, neededBy, removeNeededBy, addNeededBy } = useItems();
-  const { user } = useUser();
+  const { items, neededBy, removeNeededBy, addNeededBy, fetchItems } = useItems();
+  const { user, token, users, shopper } = useUser();
+
+  const existingShopper = users?.find((u) => u.userId === shopper?.userId);
+  const isShopperLoggedIn = user?.userId === shopper?.userId;
+
+  const mutation = useMutation({
+    mutationFn: async (shoppingItemId: number) => {
+      const req = {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+      const res = await fetch(`/api/shoppingItems/${shoppingItemId}`, req);
+      if (!res.ok) {
+        throw new Error(`fetch Error: ${res.status}`);
+      }
+    },
+    onSuccess: () => {
+      fetchItems();
+    },
+    onError: (err: Error) => {
+      alert(`Failed to remove the shopping item: ${err.message}`);
+    },
+  });
+
+  function handleClick(shoppingItemId: number) {
+    mutation.mutate(shoppingItemId);
+  }
 
   return (
     <>
@@ -55,7 +85,7 @@ export function ShoppingList({ isMobile }: Props) {
                   </div>
                 )}
                 {!isMobile && item.userId !== user.userId && (
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2 w-20">
                     {neededBy && neededBy.some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
                       <button>
                         <FaRegTrashAlt onClick={() => removeNeededBy(user.userId, item.shoppingItemId)} className="text-2xl text-red-400" />
@@ -66,6 +96,13 @@ export function ShoppingList({ isMobile }: Props) {
                         <IoMdAddCircleOutline onClick={() => addNeededBy(user?.userId, item.shoppingItemId)} className="text-3xl text-green-500" />
                       </button>
                     )}
+                  </div>
+                )}
+                {!isMobile && existingShopper && isShopperLoggedIn && (
+                  <div className="flex justify-end">
+                    <button onClick={() => handleClick(item.shoppingItemId)} className="h-10 px-2 py-2 mt-4 w-20 rounded-md text-sm font-medium whitespace-nowrap bg-red-500 hover:bg-red-700 text-slate-50 dark:bg-slate-50 dark:text-slate-900">
+                      Done
+                    </button>
                   </div>
                 )}
               </li>
