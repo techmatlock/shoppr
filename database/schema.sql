@@ -26,10 +26,9 @@ CREATE TABLE "neededBy" (
   "shoppingItemId" integer
 );
 
-CREATE TABLE "assignees" (
-  "assigneesId" serial PRIMARY KEY,
+CREATE TABLE "shopper" (
+  "shopperId" serial PRIMARY KEY,
   "userId" integer,
-  "shoppingItemsId" integer,
   "createdAt" timestamp NOT NULL DEFAULT (now())
 );
 
@@ -54,9 +53,7 @@ ALTER TABLE "neededBy" ADD FOREIGN KEY ("userId") REFERENCES "users" ("userId");
 
 ALTER TABLE "neededBy" ADD FOREIGN KEY ("shoppingItemId") REFERENCES "shoppingItems" ("shoppingItemId");
 
-ALTER TABLE "assignees" ADD FOREIGN KEY ("userId") REFERENCES "users" ("userId");
-
-ALTER TABLE "assignees" ADD FOREIGN KEY ("shoppingItemsId") REFERENCES "shoppingItems" ("shoppingItemId");
+ALTER TABLE "shopper" ADD FOREIGN KEY ("userId") REFERENCES "users" ("userId");
 
 ALTER TABLE "groupMembers" ADD FOREIGN KEY ("groupId") REFERENCES "groups" ("groupId");
 

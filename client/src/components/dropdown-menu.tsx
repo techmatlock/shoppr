@@ -1,10 +1,11 @@
 import { useUser } from "@/context/useUser";
+import { getInitials } from "@/lib/data";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export function DropDownMenu() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { user, getInitials, handleSignOut } = useUser();
+  const { user, handleSignOut } = useUser();
 
   function handleClick() {
     setIsOpen(!isOpen);
