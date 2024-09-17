@@ -9,6 +9,7 @@ export type UserContextValues = {
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
   getInitials: (name: string) => string;
+  fetchShopper: () => void;
 };
 
 export const UserContext = createContext<UserContextValues>({
@@ -19,6 +20,7 @@ export const UserContext = createContext<UserContextValues>({
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
   getInitials: () => "",
+  fetchShopper: () => undefined,
 });
 
 type Props = {
@@ -26,7 +28,7 @@ type Props = {
 };
 
 export function UserProvider({ children }: Props) {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User>(); // Specifies only the user that's logged in
   const [users, setUsers] = useState<User[]>([]);
   const [shopper, setShopper] = useState<Shopper>();
   const [token, setToken] = useState<string>();
@@ -83,10 +85,19 @@ export function UserProvider({ children }: Props) {
     }
   }
 
+  async function fetchShopper() {
+    try {
+      const data = await getShopper();
+      setShopper(data);
+    } catch (error) {
+      setError(error);
+    }
+  }
+
   if (error) {
     return <div>Error! {error instanceof Error ? error.message : "Unknown error"}</div>;
   }
 
-  const contextValue = { user, users, token, shopper, undefined, handleSignIn, handleSignOut, getInitials };
+  const contextValue = { user, users, token, shopper, handleSignIn, handleSignOut, getInitials, fetchShopper };
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
