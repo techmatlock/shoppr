@@ -166,6 +166,25 @@ app.post("/api/shoppingItems", authMiddleware, async (req, res, next) => {
   }
 });
 
+app.put("/api/shoppingItems/:shoppingItemId", authMiddleware, async (req, res, next) => {
+  try {
+    const { shoppingItemId } = req.params;
+    if (!Number.isInteger(+shoppingItemId)) throw new ClientError(400, `shoppingItemId ${shoppingItemId} must be a number.`);
+    const sql = `
+    update "shoppingItems"
+        set "status" = $1
+        where "shoppingItemId" = $2
+        returning *;
+    `;
+    const params = ["completed", shoppingItemId];
+    const result = await db.query(sql, params);
+    const [item] = result.rows;
+    res.json(item);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get("/api/neededBy", async (req, res, next) => {
   try {
     const sql = `
