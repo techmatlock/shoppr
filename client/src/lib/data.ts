@@ -93,3 +93,13 @@ export async function getUsers(): Promise<User[]> {
   if (!res.ok) throw new Error(`Response status: ${res.status}`);
   return (await res.json()) as User[];
 }
+
+export function getInitials(name: string): string {
+  if (!name) return "";
+  const words = name.split(" ");
+  if (words && words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  } else {
+    return words[0][0].toUpperCase() || "";
+  }
+}
