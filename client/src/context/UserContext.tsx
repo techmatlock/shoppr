@@ -8,7 +8,6 @@ export type UserContextValues = {
   shopper: Shopper | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
-  getInitials: (name: string) => string;
   fetchShopper: () => void;
 };
 
@@ -19,7 +18,6 @@ export const UserContext = createContext<UserContextValues>({
   shopper: undefined,
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
-  getInitials: () => "",
   fetchShopper: () => undefined,
 });
 
@@ -75,16 +73,6 @@ export function UserProvider({ children }: Props) {
     removeAuth();
   }
 
-  function getInitials(name: string): string {
-    if (!name) return "";
-    const words = name.split(" ");
-    if (words && words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    } else {
-      return words[0][0].toUpperCase() || "";
-    }
-  }
-
   async function fetchShopper() {
     try {
       const data = await getShopper();
@@ -98,6 +86,6 @@ export function UserProvider({ children }: Props) {
     return <div>Error! {error instanceof Error ? error.message : "Unknown error"}</div>;
   }
 
-  const contextValue = { user, users, token, shopper, handleSignIn, handleSignOut, getInitials, fetchShopper };
+  const contextValue = { user, users, token, shopper, handleSignIn, handleSignOut, fetchShopper };
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
