@@ -235,12 +235,12 @@ app.delete("/api/neededBy/:userId", authMiddleware, async (req, res, next) => {
 app.get("/api/shopper", async (req, res, next) => {
   try {
     const sql = `
-    select * 
+    select *
         from "shopper"
     `;
     const result = await db.query<Shopper>(sql);
     const [shopper] = result.rows;
-    res.json(shopper);
+    res.json(shopper || null);
   } catch (error) {
     next(error);
   }
@@ -249,7 +249,7 @@ app.get("/api/shopper", async (req, res, next) => {
 app.post("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.params;
-    if (!userId) throw new ClientError(400, `userId ${userId} must be a number.`);
+    if (!Number.isInteger(+userId)) throw new ClientError(400, `userId ${userId} must be a number.`);
     const sql = `
     insert into "shopper" ("userId")
         values ($1)
@@ -263,6 +263,22 @@ app.post("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
     `;
     const result = await db.query<Shopper>(getShopperSql);
     res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!Number.isInteger(+userId)) throw new ClientError(400, `userId ${userId} must be a number.`);
+    const sql = `
+    delete from "shopper"
+        where "userId" = $1
+    `;
+    const params = [userId];
+    await db.query(sql, params);
+    res.status(204).json({ message: "successfully deleted shopper" });
   } catch (error) {
     next(error);
   }
