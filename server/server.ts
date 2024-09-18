@@ -25,6 +25,12 @@ type Shopper = {
   userId: number;
 };
 
+type Messages = {
+  userId: number;
+  message: string;
+  timestamp: string;
+};
+
 type Auth = {
   username: string;
   password: string;
@@ -325,6 +331,37 @@ app.delete("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
     const params = [userId];
     await db.query(sql, params);
     res.status(204).json({ message: "successfully deleted shopper" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/messages", async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "messages";
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/messages", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId, message, timestamp } = req.body;
+    if (!userId || !message || !timestamp) throw new ClientError(400, "userId, message, and timestamp are required");
+    const sql = `
+    insert into "messages" ("userId", "message", "timestamp")
+        values ($1, $2, $3)
+        returning *;
+    `;
+    const params = [userId, message, timestamp];
+    const result = await db.query<Messages>(sql, params);
+    const [msg] = result.rows;
+    res.json(msg);
   } catch (error) {
     next(error);
   }
