@@ -72,7 +72,8 @@ export function SideBar() {
             </button>
           )}
       </div>
-      <div className="flex items-center mt-40">
+      <hr className="my-12 mx-auto w-64 border-black border-opacity-20" />
+      <div className="flex items-center">
         <ChatBox />
       </div>
     </>
