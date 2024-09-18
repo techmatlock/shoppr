@@ -2,9 +2,19 @@ import { useEffect, useState } from "react";
 import { AddNewForm } from "../components/add-new-form";
 import { ShoppingList } from "../components/shopping-list";
 import { SideBar } from "../components/sidebar";
+import { useUser } from "@/context/useUser";
+import { useNavigate } from "react-router-dom";
 
 export function IndexPage() {
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/sign-in");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     if (window.innerWidth <= 640) {

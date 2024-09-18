@@ -2,6 +2,9 @@
 import "dotenv/config";
 import express from "express";
 import pg from "pg";
+import { Server } from "socket.io";
+import http from "http";
+import cors from "cors";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { authMiddleware, ClientError, errorMiddleware } from "./lib/index.js";
@@ -20,6 +23,12 @@ type NeededBy = {
 type Shopper = {
   shopperId: number;
   userId: number;
+};
+
+type Messages = {
+  userId: number;
+  message: string;
+  timestamp: string;
 };
 
 type Auth = {
@@ -43,8 +52,32 @@ const hashKey = process.env.TOKEN_SECRET;
 if (!hashKey) throw new Error("TOKEN_SECRET not found in .env");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
+io.on("connection", (socket) => {
+  console.log("A new user has connected", socket.id);
+
+  socket.on("message", (message) => {
+    io.emit("message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(socket.id, " disconnected");
+  });
+});
 
 app.post("/api/auth/sign-up", async (req, res, next) => {
   try {
@@ -303,8 +336,41 @@ app.delete("/api/shopper/:userId", authMiddleware, async (req, res, next) => {
   }
 });
 
+app.get("/api/messages", async (req, res, next) => {
+  try {
+    const sql = `
+    select *
+        from "messages";
+    `;
+    const result = await db.query(sql);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/messages", authMiddleware, async (req, res, next) => {
+  try {
+    const { userId, message, timestamp } = req.body;
+    if (!userId || !message || !timestamp) throw new ClientError(400, "userId, message, and timestamp are required");
+    const sql = `
+    insert into "messages" ("userId", "message", "timestamp")
+        values ($1, $2, $3)
+        returning *;
+    `;
+    const params = [userId, message, timestamp];
+    const result = await db.query<Messages>(sql, params);
+    const [msg] = result.rows;
+    res.json(msg);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
   console.log("Listening on port", process.env.PORT);
 });
+
+io.listen(8085);

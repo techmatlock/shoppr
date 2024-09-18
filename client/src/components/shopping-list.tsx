@@ -85,7 +85,7 @@ export function ShoppingList({ isMobile }: Props) {
                   </div>
                 )}
                 {!isMobile && item.userId !== user.userId && (
-                  <div className="flex items-center justify-center space-x-2 w-20">
+                  <div className="flex items-center justify-center space-x-2">
                     {neededBy && neededBy.some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
                       <button>
                         <FaRegTrashAlt onClick={() => removeNeededBy(user.userId, item.shoppingItemId)} className="text-2xl text-red-400" />
