@@ -13,7 +13,7 @@ type Message = {
 };
 
 export function ChatBox() {
-  const { user, token } = useUser();
+  const { user, users, token } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState("");
 
@@ -70,7 +70,7 @@ export function ChatBox() {
   };
 
   return (
-    <div className="flex justify-center items-center w-full ">
+    <div className="flex justify-center items-center w-full">
       <div className="bg-white rounded-lg w-96 h-96 p-4 shadow-md">
         <div className="flex flex-col h-full">
           <div className="flex-1 p-2 overflow-y-auto bg-gray-100 rounded-md">
@@ -78,7 +78,7 @@ export function ChatBox() {
               <div key={index}>
                 <div className="flex items-center">
                   <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden my-2 mr-2 bg-green-300 rounded-full dark:bg-gray-600">
-                    <span className="font-medium text-gray-600 dark:text-gray-300">{user && getInitials(user?.name)}</span>
+                    <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(users?.find((user) => user.userId === msg.userId)?.name || "")}</span>
                   </div>
                   <div
                     className=" bg-blue-500 
