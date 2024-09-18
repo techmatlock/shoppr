@@ -27,6 +27,7 @@ A full stack React project for users who want to group buy groceries in bulk and
 - Users can elect themselves to be the current shopper
 
 ## Preview
+![Recording 2024-09-18 at 16 45 05](https://github.com/user-attachments/assets/00b1de4b-b80c-4192-9be6-73620f8dcac9)
 
 ## Installation
 
