@@ -5,7 +5,6 @@ A full stack React project for users who want to group buy groceries in bulk and
 ## Table of Contents
 
 - [Technologies Used](#technologies-used)
-- [Live Demo](#live-demo)
 - [Features](#features)
 - [Preview](#preview)
 - [Installation](#installation)
@@ -20,13 +19,11 @@ A full stack React project for users who want to group buy groceries in bulk and
 - TypeScript
 - AWS
 
-## Live Demo
-
 ## Features
 
 - Users can register and login
-- Users can shopping items
-- Users can remove or add themselves to the needed list for each shopping item
+- Users can add shopping items
+- Users can remove or add to need item
 - Users can elect themselves to be the current shopper
 
 ## Preview
@@ -58,8 +55,6 @@ If your project will be using a database, create it now.
 1. In the `server/.env` file, in the `DATABASE_URL` value, replace `changeMe` with the name of your database, from the last step
 1. While you are editing `server/.env`, also change the value of `TOKEN_SECRET` to a custom value, without spaces.
 1. Make the same changes to `server/.env.example`.
-
-If your project will _not_ be using a database, edit `package.json` to remove the `dev:db` script.
 
 #### Start the development servers
 
