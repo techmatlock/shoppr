@@ -76,7 +76,7 @@ export function ChatBox() {
           <div className="flex-1 p-2 overflow-y-auto bg-gray-100 rounded-md">
             {messages.map((msg, index) => (
               <div key={index}>
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap">
                   <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden my-2 mr-2 bg-green-300 rounded-full dark:bg-gray-600">
                     <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(users?.find((user) => user.userId === msg.userId)?.name || "")}</span>
                   </div>
