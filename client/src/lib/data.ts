@@ -25,6 +25,12 @@ export type Shopper = {
   userId: number;
 };
 
+export type Message = {
+  userId: number;
+  message: string;
+  timestamp: string;
+};
+
 const authKey = "um.auth";
 
 type Auth = {
@@ -92,6 +98,16 @@ export async function getUsers(): Promise<User[]> {
   });
   if (!res.ok) throw new Error(`Response status: ${res.status}`);
   return (await res.json()) as User[];
+}
+
+export async function fetchMessages(): Promise<Message[]> {
+  const res = await fetch("/api/messages", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`Response status: ${res.status}`);
+  return (await res.json()) as Message[];
 }
 
 export function getInitials(name: string): string {
