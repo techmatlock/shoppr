@@ -60,12 +60,20 @@ const io = new Server(server, {
   },
 });
 
-app.use(express.json());
 app.use(
   cors({
     origin: "*",
   })
 );
+
+// Create paths for static directories
+const reactStaticDir = new URL("../client/dist", import.meta.url).pathname;
+const uploadsStaticDir = new URL("public", import.meta.url).pathname;
+
+app.use(express.static(reactStaticDir));
+// Static directory for file uploads server/public/
+app.use(express.static(uploadsStaticDir));
+app.use(express.json());
 
 io.on("connection", (socket) => {
   console.log("A new user has connected", socket.id);
@@ -366,6 +374,13 @@ app.post("/api/messages", authMiddleware, async (req, res, next) => {
     next(error);
   }
 });
+
+/*
+ * Handles paths that aren't handled by any other route handler.
+ * It responds with `index.html` to support page refreshes with React Router.
+ * This must be the _last_ route, just before errorMiddleware.
+ */
+app.get("*", (req, res) => res.sendFile(`${reactStaticDir}/index.html`));
 
 app.use(errorMiddleware);
 

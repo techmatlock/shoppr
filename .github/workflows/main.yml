@@ -17,14 +17,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Set Git to be case-sensitive
-        run: git config core.ignorecase false
-
-      - name: Build project
-        run: |
-          npm ci
-          npm run build
-
       - name: Copy project to EC2
         uses: burnett01/rsync-deployments@7.0.1
         with:
