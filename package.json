@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "build": "npm run build --prefix client",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
     "db:import": "sh database/import.sh"
