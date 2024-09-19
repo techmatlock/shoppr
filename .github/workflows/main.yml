@@ -17,6 +17,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: Set Git to be case-sensitive
+        run: git config core.ignorecase false
+
       - name: Build project
         run: |
           npm ci
