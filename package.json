@@ -4,9 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "NODE_ENV=production npm start --prefix server",
     "build": "npm run build --prefix client",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
-    "db:import": "sh database/import.sh"
+    "install:client": "npm install --prefix client",
+    "install:server": "npm install --prefix server",
+    "db:import": "sh database/import.sh",
+    "deploy": "git push --force origin master"
   }
 }
