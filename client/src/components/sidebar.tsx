@@ -1,5 +1,5 @@
 import { useUser } from "@/context/useUser";
-import { getInitials } from "@/lib/data";
+import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { ChatBox } from "./chatbox";
 
@@ -18,7 +18,7 @@ export function SideBar() {
           "Content-Type": "application/json",
         },
       };
-      const res = await fetch(`/api/shopper/${userId}`, req);
+      const res = await fetch(`${apiUrl}/api/shopper/${userId}`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
