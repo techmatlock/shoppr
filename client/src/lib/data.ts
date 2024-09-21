@@ -38,6 +38,8 @@ type Auth = {
   token: string;
 };
 
+export const apiUrl = process.env.API_URL;
+
 export function saveAuth(user: User, token: string): void {
   const auth: Auth = { user, token };
   localStorage.setItem(authKey, JSON.stringify(auth));
@@ -60,7 +62,7 @@ export function readToken(): string | undefined {
 }
 
 export async function getItems(): Promise<ShoppingItems[]> {
-  const res = await fetch("/api/shoppingItems", {
+  const res = await fetch(`${apiUrl}/api/shoppingItems`, {
     headers: {
       "Content-Type": "application/json",
     },
