@@ -10,11 +10,11 @@ export function IndexPage() {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/sign-in");
-    }
-  }, [user, navigate]);
+  //   useEffect(() => {
+  //     if (!user) {
+  //       navigate("/sign-in");
+  //     }
+  //   }, [user, navigate]);
 
   useEffect(() => {
     if (window.innerWidth <= 640) {
