@@ -147,6 +147,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     const { username, password } = parsedBody;
 
     const user = await getUserByUsername(client, username);
+
     if (!user) {
       return {
         statusCode: 401,
@@ -154,7 +155,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       };
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
     if (!isPasswordValid) {
       return {
         statusCode: 401,
