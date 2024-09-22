@@ -41,7 +41,7 @@ export function SignUpPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       };
-      const res = await fetch(`${apiUrl}/api/auth/sign-up`, req);
+      const res = await fetch(`${apiUrl}/api/sign-up`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
