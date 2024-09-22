@@ -235,11 +235,11 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 async function getShopper(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<Shopper[]> = await client.query('SELECT * FROM "shopper"');
+    const result: QueryResult<Shopper> = await client.query('SELECT * FROM "shopper"');
     return {
       statusCode: 200,
       headers: allowedHeaders,
-      body: JSON.stringify(result.rows),
+      body: JSON.stringify(result.rows[0]),
     };
   } finally {
     client.release();
