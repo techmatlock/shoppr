@@ -13,7 +13,7 @@ dist-ssr
 *.local
 
 .env*
-shoppr.zip
+*.zip
 
 # Editor directories and files
 .vscode/*
