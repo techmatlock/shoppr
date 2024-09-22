@@ -5,7 +5,6 @@ export const handler = async (event: APIGatewayTokenAuthorizerEvent) => {
   try {
     const token = event.authorizationToken.split(" ")[1];
 
-    // Verify and decode the JWT
     const payload = jwt.verify(token, process.env.SECRET_KEY, {
       algorithms: ["HS256"],
     });
