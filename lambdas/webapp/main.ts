@@ -82,6 +82,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         return await addMessage(event);
       case "POST /sign-up":
         return await signUp(event);
+      case "POST /sign-in":
+        return await signIn(event);
       default:
         return {
           statusCode: 400,
@@ -125,6 +127,44 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     return {
       statusCode: 201,
       body: JSON.stringify({ message: "User created successfully" }),
+    };
+  } finally {
+    client.release();
+  }
+}
+
+async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const client = await pool.connect();
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+
+    const parsedBody = JSON.parse(event.body) as UserCredentials;
+    const { username, password } = parsedBody;
+
+    const user = await getUserByUsername(client, username);
+    if (!user) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid credentials" }),
+      };
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid credentials" }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Sign in successful", username: user.username }),
     };
   } finally {
     client.release();
