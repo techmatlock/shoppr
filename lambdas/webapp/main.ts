@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { Pool, QueryResult } from "pg";
+import * as bcrypt from "bcryptjs";
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -23,6 +24,7 @@ interface Users {
   userId: number;
   name: string;
   username: string;
+  hashedPassword: string;
 }
 
 interface Message {
@@ -38,6 +40,11 @@ interface Shopper {
 interface NeededBy {
   userId: number;
   shoppingItemId: number;
+}
+
+interface UserCredentials {
+  username: string;
+  password: string;
 }
 
 const allowedHeaders = {
@@ -73,6 +80,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         return await getMessages();
       case "POST /messages":
         return await addMessage(event);
+      case "POST /sign-up":
+        return await signUp(event);
       default:
         return {
           statusCode: 400,
@@ -87,6 +96,40 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 };
+
+async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const client = await pool.connect();
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+    const parsedBody = JSON.parse(event.body) as UserCredentials;
+    const { username, password } = parsedBody;
+
+    const existingUser = await getUserByUsername(client, username);
+
+    if (existingUser) {
+      return {
+        statusCode: 409,
+        body: JSON.stringify({ message: "Username already exists" }),
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify({ message: "User created successfully" }),
+    };
+  } finally {
+    client.release();
+  }
+}
 
 async function getUsers(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
@@ -348,4 +391,9 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
   } finally {
     client.release();
   }
+}
+
+async function getUserByUsername(client: any, username: string): Promise<any> {
+  const result: QueryResult<Users> = await client.query('SELECT * FROM "users" WHERE "username" = $1', [username]);
+  return result.rows[0];
 }
