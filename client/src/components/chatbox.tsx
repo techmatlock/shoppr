@@ -1,5 +1,5 @@
 import { useUser } from "@/context/useUser";
-import { fetchMessages, getInitials } from "@/lib/data";
+import { apiUrl, fetchMessages, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
@@ -48,7 +48,7 @@ export function ChatBox() {
         },
         body: JSON.stringify(newMessage),
       };
-      const res = await fetch("/api/messages", req);
+      const res = await fetch(`${apiUrl}/api/messages`, req);
       if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
     },
     onSuccess: async () => {

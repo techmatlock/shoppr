@@ -1,6 +1,6 @@
 import { useItems } from "@/context/useItems.tsx";
 import { useUser } from "@/context/useUser";
-import { getInitials } from "@/lib/data";
+import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
@@ -25,7 +25,7 @@ export function ShoppingList({ isMobile }: Props) {
           "Content-Type": "application/json",
         },
       };
-      const res = await fetch(`/api/shoppingItems/${shoppingItemId}`, req);
+      const res = await fetch(`${apiUrl}/api/shoppingItems/${shoppingItemId}`, req);
       if (!res.ok) {
         throw new Error(`fetch Error: ${res.status}`);
       }

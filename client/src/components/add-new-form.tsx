@@ -1,5 +1,6 @@
 import { useItems } from "@/context/useItems";
 import { useUser } from "@/context/useUser";
+import { apiUrl } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useRef } from "react";
 
@@ -23,7 +24,7 @@ export function AddNewForm() {
         },
         body: JSON.stringify(newPost),
       };
-      const res = await fetch("/api/shoppingItems", req);
+      const res = await fetch(`${apiUrl}/api/shoppingItems`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }

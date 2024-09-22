@@ -8,6 +8,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { apiUrl } from "@/lib/data";
 
 const formSchema = z.object({
   name: z.string().min(8, {
@@ -40,7 +41,7 @@ export function SignUpPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       };
-      const res = await fetch("/api/auth/sign-up", req);
+      const res = await fetch(`${apiUrl}/api/auth/sign-up`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }

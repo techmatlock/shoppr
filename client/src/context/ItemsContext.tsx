@@ -1,4 +1,4 @@
-import { getItems, getNeededBy, NeededBy, ShoppingItems } from "@/lib/data";
+import { apiUrl, getItems, getNeededBy, NeededBy, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useUser } from "./useUser";
 
@@ -71,7 +71,7 @@ export function ItemsProvider({ children }: Props) {
         await removeNeededBy(userId, shoppingItemId);
         return;
       }
-      const res = await fetch(`/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export function ItemsProvider({ children }: Props) {
 
   async function removeNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const res = await fetch(`/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

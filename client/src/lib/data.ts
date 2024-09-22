@@ -38,6 +38,8 @@ type Auth = {
   token: string;
 };
 
+export const apiUrl = "https://p6q481zlid.execute-api.us-east-1.amazonaws.com";
+
 export function saveAuth(user: User, token: string): void {
   const auth: Auth = { user, token };
   localStorage.setItem(authKey, JSON.stringify(auth));
@@ -60,7 +62,7 @@ export function readToken(): string | undefined {
 }
 
 export async function getItems(): Promise<ShoppingItems[]> {
-  const res = await fetch("/api/shoppingItems", {
+  const res = await fetch(`${apiUrl}/api/shoppingItems`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -71,7 +73,7 @@ export async function getItems(): Promise<ShoppingItems[]> {
 
 // Get users that requested they need the shopping item
 export async function getNeededBy(): Promise<NeededBy[]> {
-  const res = await fetch("/api/neededBy", {
+  const res = await fetch(`${apiUrl}/api/neededBy`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -81,7 +83,7 @@ export async function getNeededBy(): Promise<NeededBy[]> {
 }
 
 export async function getShopper(): Promise<Shopper> {
-  const res = await fetch("/api/shopper", {
+  const res = await fetch(`${apiUrl}/api/shopper`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -91,7 +93,7 @@ export async function getShopper(): Promise<Shopper> {
 }
 
 export async function getUsers(): Promise<User[]> {
-  const res = await fetch("/api/users", {
+  const res = await fetch(`${apiUrl}/api/users`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -101,7 +103,7 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function fetchMessages(): Promise<Message[]> {
-  const res = await fetch("/api/messages", {
+  const res = await fetch(`${apiUrl}/api/messages`, {
     headers: {
       "Content-Type": "application/json",
     },

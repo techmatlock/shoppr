@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/context/useUser";
-import { User } from "@/lib/data";
+import { apiUrl, User } from "@/lib/data";
 import { useEffect } from "react";
 
 const formSchema = z.object({
@@ -53,7 +53,7 @@ export function SignInPage() {
         },
         body: JSON.stringify(values),
       };
-      const res = await fetch("/api/auth/sign-in", req);
+      const res = await fetch(`${apiUrl}/api/auth/sign-in`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
