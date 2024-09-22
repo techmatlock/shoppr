@@ -204,7 +204,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       };
     }
     const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body);
+    const shoppingItemId: number = JSON.parse(event.body)?.shoppingItemId;
 
     if (!userId || !shoppingItemId) {
       return {
@@ -235,7 +235,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 async function getShopper(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<Users> = await client.query('SELECT * FROM "shopper"');
+    const result: QueryResult<Shopper[]> = await client.query('SELECT * FROM "shopper"');
     return {
       statusCode: 200,
       headers: allowedHeaders,
@@ -261,7 +261,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     const userId = parseInt(userIdString);
     const shoppingItemId: number = JSON.parse(event.body);
 
-    const result: QueryResult<ShoppingItem> = await client.query('INSERT INTO "shopper" ("userId", "shoppingItemId") VALUES ($1, $2) RETURNING *', [userId, shoppingItemId]);
+    const result: QueryResult<Shopper> = await client.query('INSERT INTO "shopper" ("userId", "shoppingItemId") VALUES ($1, $2) RETURNING *', [userId, shoppingItemId]);
 
     if (result.rowCount === 0) {
       return {
