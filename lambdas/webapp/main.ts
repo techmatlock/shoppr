@@ -32,7 +32,6 @@ interface Message {
 }
 
 interface Shopper {
-  shopperId: number;
   userId: number;
 }
 
@@ -251,7 +250,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
   try {
     const userIdString = event.queryStringParameters?.id;
 
-    if (!userIdString || !event.body) {
+    if (!userIdString) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing required parameters" }),
@@ -259,9 +258,8 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     }
 
     const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body);
 
-    const result: QueryResult<Shopper> = await client.query('INSERT INTO "shopper" ("userId", "shoppingItemId") VALUES ($1, $2) RETURNING *', [userId, shoppingItemId]);
+    const result: QueryResult<Shopper> = await client.query('INSERT INTO "shopper" ("userId") VALUES ($1) RETURNING *', [userId]);
 
     if (result.rowCount === 0) {
       return {
@@ -294,7 +292,7 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     const userId = parseInt(userIdString);
 
-    const result: QueryResult<Shopper> = await client.query('DELETE FROM "neededBy" WHERE "userId" = $1', [userId]);
+    const result: QueryResult<Shopper> = await client.query('DELETE FROM "shopper" WHERE "userId" = $1', [userId]);
 
     if (result.rowCount === 0) {
       return {
