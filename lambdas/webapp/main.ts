@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { Pool, QueryResult } from "pg";
+import * as bcrypt from "bcryptjs";
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -23,6 +24,7 @@ interface Users {
   userId: number;
   name: string;
   username: string;
+  hashedPassword: string;
 }
 
 interface Message {
@@ -32,13 +34,17 @@ interface Message {
 }
 
 interface Shopper {
-  shopperId: number;
   userId: number;
 }
 
 interface NeededBy {
   userId: number;
   shoppingItemId: number;
+}
+
+interface UserCredentials {
+  username: string;
+  password: string;
 }
 
 const allowedHeaders = {
@@ -74,6 +80,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         return await getMessages();
       case "POST /messages":
         return await addMessage(event);
+      case "POST /sign-up":
+        return await signUp(event);
+      case "POST /sign-in":
+        return await signIn(event);
       default:
         return {
           statusCode: 400,
@@ -88,6 +98,79 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 };
+
+async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const client = await pool.connect();
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+    const parsedBody = JSON.parse(event.body) as UserCredentials;
+    const { username, password } = parsedBody;
+
+    const existingUser = await getUserByUsername(client, username);
+
+    if (existingUser) {
+      return {
+        statusCode: 409,
+        body: JSON.stringify({ message: "Username already exists" }),
+      };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify({ message: "User created successfully" }),
+    };
+  } finally {
+    client.release();
+  }
+}
+
+async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const client = await pool.connect();
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+
+    const parsedBody = JSON.parse(event.body) as UserCredentials;
+    const { username, password } = parsedBody;
+
+    const user = await getUserByUsername(client, username);
+
+    if (!user) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid credentials" }),
+      };
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+    if (!isPasswordValid) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Invalid credentials" }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Sign in successful", username: user.username }),
+    };
+  } finally {
+    client.release();
+  }
+}
 
 async function getUsers(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
@@ -204,7 +287,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       };
     }
     const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body);
+    const shoppingItemId: number = JSON.parse(event.body)?.shoppingItemId;
 
     if (!userId || !shoppingItemId) {
       return {
@@ -235,11 +318,11 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 async function getShopper(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<Users> = await client.query('SELECT * FROM "shopper"');
+    const result: QueryResult<Shopper> = await client.query('SELECT * FROM "shopper"');
     return {
       statusCode: 200,
       headers: allowedHeaders,
-      body: JSON.stringify(result.rows),
+      body: JSON.stringify(result.rows[0]),
     };
   } finally {
     client.release();
@@ -251,7 +334,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
   try {
     const userIdString = event.queryStringParameters?.id;
 
-    if (!userIdString || !event.body) {
+    if (!userIdString) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Missing required parameters" }),
@@ -259,9 +342,8 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     }
 
     const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body);
 
-    const result: QueryResult<ShoppingItem> = await client.query('INSERT INTO "shopper" ("userId", "shoppingItemId") VALUES ($1, $2) RETURNING *', [userId, shoppingItemId]);
+    const result: QueryResult<Shopper> = await client.query('INSERT INTO "shopper" ("userId") VALUES ($1) RETURNING *', [userId]);
 
     if (result.rowCount === 0) {
       return {
@@ -294,7 +376,7 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     const userId = parseInt(userIdString);
 
-    const result: QueryResult<Shopper> = await client.query('DELETE FROM "neededBy" WHERE "userId" = $1', [userId]);
+    const result: QueryResult<Shopper> = await client.query('DELETE FROM "shopper" WHERE "userId" = $1', [userId]);
 
     if (result.rowCount === 0) {
       return {
@@ -350,4 +432,9 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
   } finally {
     client.release();
   }
+}
+
+async function getUserByUsername(client: any, username: string): Promise<any> {
+  const result: QueryResult<Users> = await client.query('SELECT * FROM "users" WHERE "username" = $1', [username]);
+  return result.rows[0];
 }
