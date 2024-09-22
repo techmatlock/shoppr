@@ -12,7 +12,7 @@ export function SideBar() {
   const mutation = useMutation({
     mutationFn: async ({ userId, action }: { userId: number; action: string }) => {
       const req = {
-        method: action === "remove" ? "DELETE" : "POST", // action is either "add" or "remove"
+        method: action === "remove" ? "DELETE" : "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
