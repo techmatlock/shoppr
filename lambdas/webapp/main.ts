@@ -168,7 +168,6 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
   const client = await pool.connect();
   try {
     const userIdString = event.queryStringParameters?.userId;
-    console.log("event.queryStringParameters", event.queryStringParameters);
 
     if (!userIdString || !event.body) {
       return {

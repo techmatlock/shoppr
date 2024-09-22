@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 export const handler = async (event: APIGatewayTokenAuthorizerEvent) => {
   try {
-    console.log("event", event);
     const token = event.authorizationToken.split(" ")[1];
 
     // Verify and decode the JWT
