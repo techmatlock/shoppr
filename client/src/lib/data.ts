@@ -1,5 +1,3 @@
-import { useUser } from "@/context/useUser";
-
 export type ShoppingItems = {
   shoppingItemId: number;
   title: string;
@@ -42,8 +40,6 @@ type Auth = {
 
 export const apiUrl = "https://p6q481zlid.execute-api.us-east-1.amazonaws.com";
 
-const { token } = useUser();
-
 export function saveAuth(user: User, token: string): void {
   const auth: Auth = { user, token };
   localStorage.setItem(authKey, JSON.stringify(auth));
@@ -63,62 +59,6 @@ export function readToken(): string | undefined {
   const auth = localStorage.getItem(authKey);
   if (!auth) return undefined;
   return (JSON.parse(auth) as Auth).token;
-}
-
-export async function getItems(): Promise<ShoppingItems[]> {
-  const res = await fetch(`${apiUrl}/api/shoppingItems`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as ShoppingItems[];
-}
-
-// Get users that requested they need the shopping item
-export async function getNeededBy(): Promise<NeededBy[]> {
-  const res = await fetch(`${apiUrl}/api/neededBy`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as NeededBy[];
-}
-
-export async function getShopper(): Promise<Shopper> {
-  const res = await fetch(`${apiUrl}/api/shopper`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as Shopper;
-}
-
-export async function getUsers(): Promise<User[]> {
-  const res = await fetch(`${apiUrl}/api/users`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as User[];
-}
-
-export async function fetchMessages(): Promise<Message[]> {
-  const res = await fetch(`${apiUrl}/api/messages`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`Response status: ${res.status}`);
-  return (await res.json()) as Message[];
 }
 
 export function getInitials(name: string): string {
