@@ -1,4 +1,4 @@
-import { apiUrl, getItems, getNeededBy, NeededBy, ShoppingItems } from "@/lib/data";
+import { apiUrl, NeededBy, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useUser } from "./useUser";
 
@@ -103,6 +103,29 @@ export function ItemsProvider({ children }: Props) {
     } catch (error) {
       setError(error);
     }
+  }
+
+  async function getItems(): Promise<ShoppingItems[]> {
+    const res = await fetch(`${apiUrl}/api/shoppingItems`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as ShoppingItems[];
+  }
+
+  // Get users that requested they need the shopping item
+  async function getNeededBy(): Promise<NeededBy[]> {
+    const res = await fetch(`${apiUrl}/api/neededBy`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as NeededBy[];
   }
 
   async function checkIfNeedExists(userId: number, shoppingItemId: number) {
