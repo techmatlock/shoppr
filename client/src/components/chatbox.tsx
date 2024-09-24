@@ -1,5 +1,5 @@
 import { useUser } from "@/context/useUser";
-import { apiUrl, fetchMessages, getInitials } from "@/lib/data";
+import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
@@ -32,6 +32,17 @@ export function ChatBox() {
     };
     loadMessages();
   }, []);
+
+  async function fetchMessages(): Promise<Message[]> {
+    const res = await fetch(`${apiUrl}/api/messages`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as Message[];
+  }
 
   const mutation = useMutation({
     mutationFn: async ({ message, timestamp }: { message: string; timestamp: string }) => {

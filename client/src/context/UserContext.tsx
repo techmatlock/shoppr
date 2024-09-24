@@ -1,4 +1,4 @@
-import { getShopper, getUsers, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "@/lib/data";
+import { apiUrl, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "@/lib/data";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 export type UserContextValues = {
@@ -80,6 +80,28 @@ export function UserProvider({ children }: Props) {
     } catch (error) {
       setError(error);
     }
+  }
+
+  async function getShopper(): Promise<Shopper> {
+    const res = await fetch(`${apiUrl}/api/shopper`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as Shopper;
+  }
+
+  async function getUsers(): Promise<User[]> {
+    const res = await fetch(`${apiUrl}/api/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Response status: ${res.status}`);
+    return (await res.json()) as User[];
   }
 
   if (error) {
