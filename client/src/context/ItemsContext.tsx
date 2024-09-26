@@ -1,6 +1,6 @@
-import { apiUrl, NeededBy, ShoppingItems } from "@/lib/data";
+import { apiUrl, NeededBy, readToken, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
-import { useUser } from "./useUser";
+import { useAuth } from "./AuthContext";
 
 export type ItemsContextValues = {
   items: ShoppingItems[] | undefined;
@@ -27,32 +27,39 @@ type Props = {
 export function ItemsProvider({ children }: Props) {
   const [items, setItems] = useState<ShoppingItems[]>([]);
   const [neededBy, setNeededBy] = useState<NeededBy[]>([]);
-  const { token } = useUser();
+  const [token, setToken] = useState<string>();
+  const { isAuthenticated } = useAuth();
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {
-    async function loadPosts() {
-      try {
-        const data = await getItems();
-        setItems(data);
-      } catch (error) {
-        setError(error);
+    setToken(readToken());
+    if (isAuthenticated) {
+      async function loadPosts() {
+        try {
+          const data = await getItems();
+          setItems(data);
+        } catch (error) {
+          setError(error);
+        }
       }
+      loadPosts();
     }
-    loadPosts();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    async function loadNeededBy() {
-      try {
-        const data = await getNeededBy();
-        setNeededBy(data);
-      } catch (error) {
-        setError(error);
+    setToken(readToken());
+    if (isAuthenticated) {
+      async function loadNeededBy() {
+        try {
+          const data = await getNeededBy();
+          setNeededBy(data);
+        } catch (error) {
+          setError(error);
+        }
       }
+      loadNeededBy();
     }
-    loadNeededBy();
-  }, []);
+  }, [isAuthenticated]);
 
   async function fetchItems() {
     try {
