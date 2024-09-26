@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { Pool, QueryResult } from "pg";
 import * as bcrypt from "bcryptjs";
+const jwt = require("jsonwebtoken");
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -46,12 +47,6 @@ interface UserCredentials {
   username: string;
   password: string;
 }
-
-const allowedHeaders = {
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PUT,DELETE",
-};
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { httpMethod, path } = event;
@@ -105,6 +100,9 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     if (!event.body) {
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Missing request body" }),
       };
     }
@@ -113,21 +111,27 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
 
     const existingUser = await getUserByUsername(client, username);
 
-    if (existingUser) {
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
+
+      return {
+        statusCode: 201,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ message: "User created successfully" }),
+      };
+    } else {
       return {
         statusCode: 409,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ message: "Username already exists" }),
       };
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
-
-    return {
-      statusCode: 201,
-      body: JSON.stringify({ message: "User created successfully" }),
-    };
   } finally {
     client.release();
   }
@@ -139,33 +143,53 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     if (!event.body) {
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Missing request body" }),
       };
     }
 
-    const parsedBody = JSON.parse(event.body) as UserCredentials;
+    const parsedBody = JSON.parse(event.body);
     const { username, password } = parsedBody;
 
-    const user = await getUserByUsername(client, username);
+    const existingUser: Users = await getUserByUsername(client, username);
 
-    if (!user) {
+    if (!existingUser) {
       return {
         statusCode: 401,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ message: "Invalid credentials" }),
       };
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+    const { userId, hashedPassword } = existingUser;
+
+    const isPasswordValid = await bcrypt.compare(password, hashedPassword);
     if (!isPasswordValid) {
       return {
         statusCode: 401,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ message: "Invalid credentials" }),
       };
     }
 
+    const payload = {
+      userId,
+      username,
+    };
+    const token = jwt.sign(payload, process.env.SECRET_KEY);
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Sign in successful", username: user.username }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({ user: payload, token }),
     };
   } finally {
     client.release();
@@ -178,7 +202,9 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
     const result: QueryResult<Users> = await client.query('SELECT * FROM "users"');
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows),
     };
   } finally {
@@ -192,7 +218,9 @@ async function getShoppingItems(): Promise<APIGatewayProxyResult> {
     const result: QueryResult<ShoppingItem> = await client.query('SELECT * FROM "shoppingItems"');
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows),
     };
   } finally {
@@ -225,7 +253,9 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
@@ -239,7 +269,9 @@ async function getNeededBy(): Promise<APIGatewayProxyResult> {
     const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows),
     };
   } finally {
@@ -267,7 +299,9 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows),
     };
   } finally {
@@ -307,7 +341,9 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
@@ -319,9 +355,21 @@ async function getShopper(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
     const result: QueryResult<Shopper> = await client.query('SELECT * FROM "shopper"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ message: "No shopper found" }),
+      };
+    }
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
@@ -354,7 +402,9 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
     return {
       statusCode: 201,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
@@ -387,7 +437,9 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
@@ -401,7 +453,9 @@ async function getMessages(): Promise<APIGatewayProxyResult> {
     const result: QueryResult<Message[]> = await client.query('SELECT * FROM "messages"');
     return {
       statusCode: 200,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows),
     };
   } finally {
@@ -426,7 +480,9 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
     return {
       statusCode: 201,
-      headers: allowedHeaders,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify(result.rows[0]),
     };
   } finally {
