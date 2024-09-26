@@ -2,19 +2,11 @@ import { useEffect, useState } from "react";
 import { AddNewForm } from "../components/add-new-form";
 import { ShoppingList } from "../components/shopping-list";
 import { SideBar } from "../components/sidebar";
-import { useUser } from "@/context/useUser";
-import { useNavigate } from "react-router-dom";
+import { DropDownMenu } from "@/components/dropdown-menu";
+import { FaCartShopping } from "react-icons/fa6";
 
 export function IndexPage() {
-  const { user } = useUser();
-  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/sign-in");
-    }
-  }, [user, navigate]);
 
   useEffect(() => {
     if (window.innerWidth <= 640) {
@@ -34,16 +26,27 @@ export function IndexPage() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] px-12">
-      <section>
-        <AddNewForm />
-        <ShoppingList isMobile={isMobile} />
-      </section>
-      {!isMobile && (
-        <section className="shadow-md rounded-md h-full ml-4">
-          <SideBar />
+    <>
+      <header className="flex h-12 justify-between px-12 mb-2">
+        <div className="flex items-center">
+          <FaCartShopping className="text-green-500 w-full text-2xl" />
+          <p className="pl-2 text-lg">shoppR</p>
+        </div>
+        <div className="flex items-center">
+          <DropDownMenu />
+        </div>
+      </header>
+      <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] px-12">
+        <section>
+          <AddNewForm />
+          <ShoppingList isMobile={isMobile} />
         </section>
-      )}
-    </div>
+        {!isMobile && (
+          <section className="shadow-md rounded-md h-full ml-4">
+            <SideBar />
+          </section>
+        )}
+      </div>
+    </>
   );
 }

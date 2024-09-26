@@ -1,7 +1,6 @@
 import { useUser } from "@/context/useUser";
 import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
-import { ChatBox } from "./chatbox";
 
 export function SideBar() {
   const { shopper, user, token, users, fetchShopper } = useUser();
@@ -71,10 +70,6 @@ export function SideBar() {
               Assign Me
             </button>
           )}
-      </div>
-      <hr className="my-12 mx-auto w-64 border-black border-opacity-20" />
-      <div className="flex items-center">
-        <ChatBox />
       </div>
     </>
   );
