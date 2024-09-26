@@ -10,7 +10,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/context/useUser";
 import { apiUrl, User } from "@/lib/data";
-import { useEffect } from "react";
 
 const formSchema = z.object({
   username: z.string().min(5, {
@@ -28,13 +27,7 @@ type AuthData = {
 
 export function SignInPage() {
   const navigate = useNavigate();
-  const { handleSignIn, user } = useUser();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  const { handleSignIn } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
