@@ -106,15 +106,15 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
         body: JSON.stringify({ error: "Missing request body" }),
       };
     }
-    const parsedBody = JSON.parse(event.body) as UserCredentials;
-    const { username, password } = parsedBody;
+    const parsedBody = JSON.parse(event.body);
+    const { name, username, password } = parsedBody;
 
     const existingUser = await getUserByUsername(client, username);
 
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
+      await client.query('INSERT INTO "users" ("name", "username", "hashedPassword") VALUES ($1, $2, $3)', [name, username, hashedPassword]);
 
       return {
         statusCode: 201,
@@ -228,6 +228,7 @@ async function getShoppingItems(): Promise<APIGatewayProxyResult> {
   }
 }
 
+// Updates shopping item status from "pending" to "completed"
 async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
