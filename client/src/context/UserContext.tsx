@@ -1,5 +1,6 @@
 import { apiUrl, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "@/lib/data";
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export type UserContextValues = {
   user: User | undefined;
@@ -30,36 +31,49 @@ export function UserProvider({ children }: Props) {
   const [users, setUsers] = useState<User[]>([]);
   const [shopper, setShopper] = useState<Shopper>();
   const [token, setToken] = useState<string>();
+  const { isAuthenticated } = useAuth();
   const [error, setError] = useState<unknown>();
 
   useEffect(() => {
     setUser(readUser());
     setToken(readToken());
-  }, []);
+    if (isAuthenticated) {
+      setUser(readUser());
+      setToken(readToken());
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    async function loadShopper() {
-      try {
-        const data = await getShopper();
-        setShopper(data);
-      } catch (error) {
-        setError(error);
+    setUser(readUser());
+    setToken(readToken());
+    if (isAuthenticated) {
+      async function loadShopper() {
+        try {
+          const data = await getShopper();
+          setShopper(data);
+        } catch (error) {
+          setError(error);
+        }
       }
+      loadShopper();
     }
-    loadShopper();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    async function getAllUsers() {
-      try {
-        const data = await getUsers();
-        setUsers(data);
-      } catch (error) {
-        setError(error);
+    setUser(readUser());
+    setToken(readToken());
+    if (isAuthenticated) {
+      async function getAllUsers() {
+        try {
+          const data = await getUsers();
+          setUsers(data);
+        } catch (error) {
+          setError(error);
+        }
       }
+      getAllUsers();
     }
-    getAllUsers();
-  }, []);
+  }, [isAuthenticated]);
 
   function handleSignIn(user: User, token: string) {
     setUser(user);
