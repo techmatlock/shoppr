@@ -31,7 +31,7 @@ export type Message = {
   timestamp: string;
 };
 
-const authKey = "um.auth";
+export const authKey = "um.auth";
 
 type Auth = {
   user: User;
