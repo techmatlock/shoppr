@@ -54,8 +54,6 @@ export function UserProvider({ children }: Props) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    setUser(readUser());
-    setToken(readToken());
     if (isAuthenticated) {
       async function getAllUsers() {
         try {
