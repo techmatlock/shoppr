@@ -75,7 +75,7 @@ export function ItemsProvider({ children }: Props) {
   // Adds user that clicked on need item to the neededBy table
   async function addNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const existingNeed = await checkIfNeedExists(userId, shoppingItemId);
+      const existingNeed = checkIfNeedExists(userId, shoppingItemId);
       if (existingNeed) {
         await removeNeededBy(userId, shoppingItemId);
         return;
@@ -137,7 +137,7 @@ export function ItemsProvider({ children }: Props) {
     return (await res.json()) as NeededBy[];
   }
 
-  async function checkIfNeedExists(userId: number, shoppingItemId: number) {
+  function checkIfNeedExists(userId: number, shoppingItemId: number) {
     try {
       const total: NeededBy[] = [];
       Object.values(neededBy).forEach((need) => {
