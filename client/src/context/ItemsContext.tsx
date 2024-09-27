@@ -140,7 +140,7 @@ export function ItemsProvider({ children }: Props) {
   async function checkIfNeedExists(userId: number, shoppingItemId: number) {
     try {
       const total: NeededBy[] = [];
-      neededBy.forEach((need) => {
+      Object.values(neededBy).forEach((need) => {
         if (need.userId === userId && need.shoppingItemId == shoppingItemId) {
           total.push(need);
         }
