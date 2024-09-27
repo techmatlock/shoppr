@@ -1,6 +1,6 @@
-import { useUser } from "@/context/useUser";
-import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
+import { useUser } from "../context/useUser";
+import { apiUrl, getInitials } from "../lib/data";
 
 export function SideBar() {
   const { shopper, user, token, users, fetchShopper } = useUser();
@@ -16,8 +16,9 @@ export function SideBar() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ userId }),
       };
-      const res = await fetch(`${apiUrl}/api/shopper/${userId}`, req);
+      const res = await fetch(`${apiUrl}/api/shopper`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
@@ -35,15 +36,6 @@ export function SideBar() {
     mutation.mutate({ userId, action });
   }
 
-  if (shopper !== null && !existingShopper) {
-    return (
-      <div className="flex items-center justify-center flex-col">
-        <p className="font-semibold">Current Shopper</p>
-        <div>No shopper assigned.</div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="flex items-center justify-center flex-col">
@@ -51,7 +43,7 @@ export function SideBar() {
         {existingShopper && ( // If existing shopper, let others know someone is already with user info in sidebar
           <>
             <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden my-2 bg-green-300 rounded-full dark:bg-gray-600">
-              <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(existingShopper.name)}</span>
+              <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(existingShopper.username)}</span>
             </div>
             <div>
               <div className="font-medium">{existingShopper.name}</div>

@@ -285,18 +285,21 @@ async function addShoppingItem(event: APIGatewayProxyEvent): Promise<APIGatewayP
 async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const itemIdString = event.queryStringParameters?.shoppingItemId;
-
-    if (!itemIdString) {
+    if (!event.body) {
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
     }
 
-    const itemId = parseInt(itemIdString);
+    const parsedBody = JSON.parse(event.body) as ShoppingItem;
 
-    const result: QueryResult<ShoppingItem> = await client.query('UPDATE "shoppingItems" SET status = $1 WHERE "shoppingItemId" = $2 RETURNING *', ["completed", itemId]);
+    const { shoppingItemId } = parsedBody;
+
+    const result: QueryResult<ShoppingItem> = await client.query('UPDATE "shoppingItems" SET status = $1 WHERE "shoppingItemId" = $2 RETURNING *', ["completed", shoppingItemId]);
 
     if (result.rowCount === 0) {
       return {
@@ -346,28 +349,31 @@ async function getNeededBy(): Promise<APIGatewayProxyResult> {
 async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const userIdString = event.queryStringParameters?.userId;
-
-    if (!userIdString || !event.body) {
+    if (!event.body) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing required parameters" }),
-      };
-    }
-    const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body)?.shoppingItemId;
-
-    await client.query('INSERT INTO "neededBy" ("userId", "shoppingItemId") values ($1, $2)', [userId, shoppingItemId]);
-
-    const result: QueryResult<NeededBy> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
-
-    if (result.rowCount === 0) {
-      return {
-        statusCode: 404,
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({ error: "Failed to add needed by user" }),
+        body: JSON.stringify({ error: "Missing required parameters" }),
+      };
+    }
+
+    const parsedBody = JSON.parse(event.body) as ShoppingItem;
+
+    const { userId, shoppingItemId } = parsedBody;
+
+    await client.query('INSERT INTO "neededBy" ("userId", "shoppingItemId") values ($1, $2)', [userId, shoppingItemId]);
+
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "No needed by users" }),
       };
     }
 
@@ -386,41 +392,40 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const userIdString = event.queryStringParameters?.id;
-
-    if (!userIdString || !event.body) {
+    if (!event.body) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing required parameters" }),
-      };
-    }
-    const userId = parseInt(userIdString);
-    const shoppingItemId: number = JSON.parse(event.body)?.shoppingItemId;
-
-    if (!userId || !shoppingItemId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing required parameters" }),
-      };
-    }
-
-    const result: QueryResult<NeededBy> = await client.query('DELETE FROM "neededBy" WHERE "userId" = $1 AND "shoppingItemId" = $2', [userId, shoppingItemId]);
-
-    if (result.rowCount === 0) {
-      return {
-        statusCode: 404,
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({ error: "Failed to remove needed by user" }),
+        body: JSON.stringify({ error: "Missing required parameters" }),
       };
     }
+
+    const parsedBody = JSON.parse(event.body) as NeededBy;
+
+    const { userId, shoppingItemId } = parsedBody;
+
+    await client.query('DELETE FROM "neededBy" WHERE "userId" = $1 AND "shoppingItemId" = $2', [userId, shoppingItemId]);
+
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "No needed by users" }),
+      };
+    }
+
     return {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(result.rows[0]),
+      body: JSON.stringify(result.rows),
     };
   } finally {
     client.release();
@@ -456,22 +461,28 @@ async function getShopper(): Promise<APIGatewayProxyResult> {
 async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const userIdString = event.queryStringParameters?.id;
-
-    if (!userIdString) {
+    if (!event.body) {
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
     }
 
-    const userId = parseInt(userIdString);
+    const parsedBody = JSON.parse(event.body) as Shopper;
+
+    const { userId } = parsedBody;
 
     const result: QueryResult<Shopper> = await client.query('INSERT INTO "shopper" ("userId") VALUES ($1) RETURNING *', [userId]);
 
     if (result.rowCount === 0) {
       return {
         statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Failed to add shopper." }),
       };
     }
@@ -491,16 +502,19 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const userIdString = event.queryStringParameters?.id;
-
-    if (!userIdString) {
+    if (!event.body) {
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
     }
 
-    const userId = parseInt(userIdString);
+    const parsedBody = JSON.parse(event.body) as Shopper;
+
+    const { userId } = parsedBody;
 
     const result: QueryResult<Shopper> = await client.query('DELETE FROM "shopper" WHERE "userId" = $1', [userId]);
 

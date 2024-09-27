@@ -1,6 +1,6 @@
-import { apiUrl, NeededBy, readToken, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { apiUrl, NeededBy, readToken, ShoppingItems } from "../lib/data";
 
 export type ItemsContextValues = {
   items: ShoppingItems[] | undefined;
@@ -33,6 +33,9 @@ export function ItemsProvider({ children }: Props) {
 
   useEffect(() => {
     setToken(readToken());
+  });
+
+  useEffect(() => {
     if (isAuthenticated) {
       async function loadPosts() {
         try {
@@ -47,7 +50,6 @@ export function ItemsProvider({ children }: Props) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    setToken(readToken());
     if (isAuthenticated) {
       async function loadNeededBy() {
         try {
@@ -78,7 +80,7 @@ export function ItemsProvider({ children }: Props) {
         await removeNeededBy(userId, shoppingItemId);
         return;
       }
-      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,7 +98,7 @@ export function ItemsProvider({ children }: Props) {
 
   async function removeNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -138,7 +140,7 @@ export function ItemsProvider({ children }: Props) {
   async function checkIfNeedExists(userId: number, shoppingItemId: number) {
     try {
       const total: NeededBy[] = [];
-      neededBy.forEach((need) => {
+      Object.values(neededBy).forEach((need) => {
         if (need.userId === userId && need.shoppingItemId == shoppingItemId) {
           total.push(need);
         }

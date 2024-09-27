@@ -1,7 +1,7 @@
-import { useUser } from "@/context/useUser";
-import { getInitials } from "@/lib/data";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../context/useUser";
+import { getInitials } from "../lib/data";
 
 export function DropDownMenu() {
   const [isOpen, setIsOpen] = useState<boolean>(false);

@@ -1,9 +1,9 @@
-import { useItems } from "@/context/useItems.tsx";
-import { useUser } from "@/context/useUser";
-import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { useUser } from "../context/useUser";
+import { useItems } from "../context/useItems";
+import { apiUrl, getInitials } from "../lib/data";
 
 type Props = {
   isMobile: boolean;
@@ -24,8 +24,9 @@ export function ShoppingList({ isMobile }: Props) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ shoppingItemId }),
       };
-      const res = await fetch(`${apiUrl}/api/shoppingItems/${shoppingItemId}`, req);
+      const res = await fetch(`${apiUrl}/api/shoppingItems`, req);
       if (!res.ok) {
         throw new Error(`fetch Error: ${res.status}`);
       }
@@ -77,16 +78,16 @@ export function ShoppingList({ isMobile }: Props) {
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
                       <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
                     </div>
+                    {neededBy &&
+                      Object.values(neededBy)
+                        .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
+                        .map((needed, index) => (
+                          <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
+                            <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
+                          </div>
+                        ))}
                   </div>
                 )}
-                {neededBy &&
-                  Object.values(neededBy)
-                    .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
-                    .map((needed, index) => (
-                      <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
-                        <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
-                      </div>
-                    ))}
                 {!isMobile && item.userId !== user.userId && (
                   <div className="flex items-center justify-center">
                     {neededBy && Object.values(neededBy).some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
@@ -125,7 +126,7 @@ export function ShoppingList({ isMobile }: Props) {
                 {!isMobile && (
                   <div className="flex -space-x-2 rtl:space-x-reverse mx-8">
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
-                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
+                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.username)}</span>{" "}
                     </div>
                   </div>
                 )}

@@ -1,6 +1,6 @@
-import { apiUrl, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "@/lib/data";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
+import { apiUrl, readToken, readUser, removeAuth, saveAuth, Shopper, User } from "../lib/data";
 
 export type UserContextValues = {
   user: User | undefined;
@@ -37,15 +37,9 @@ export function UserProvider({ children }: Props) {
   useEffect(() => {
     setUser(readUser());
     setToken(readToken());
-    if (isAuthenticated) {
-      setUser(readUser());
-      setToken(readToken());
-    }
-  }, [isAuthenticated]);
+  });
 
   useEffect(() => {
-    setUser(readUser());
-    setToken(readToken());
     if (isAuthenticated) {
       async function loadShopper() {
         try {
@@ -60,8 +54,6 @@ export function UserProvider({ children }: Props) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    setUser(readUser());
-    setToken(readToken());
     if (isAuthenticated) {
       async function getAllUsers() {
         try {
