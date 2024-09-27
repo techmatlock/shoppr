@@ -63,8 +63,9 @@ export function ShoppingList({ isMobile }: Props) {
       </div>
       <ul>
         {user &&
-          items
-            ?.filter((item) => item.status === "pending")
+          items &&
+          Object.values(items)
+            .filter((item) => item.status === "pending")
             .map((item) => (
               <li key={item.shoppingItemId} className={`grid grid-cols-1 grid-flow-col items-center gap-4 border-b-2 py-4 ${!isMobile ? "md:grid-cols-5" : ""} ${!isMobile && existingShopper && isShopperLoggedIn ? "md:grid-cols-5" : ""}`}>
                 <div>{item.title}</div>
@@ -76,23 +77,24 @@ export function ShoppingList({ isMobile }: Props) {
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
                       <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
                     </div>
-                    {neededBy
-                      ?.filter((needed) => item.shoppingItemId === needed.shoppingItemId)
-                      .map((needed, index) => (
-                        <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
-                          <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
-                        </div>
-                      ))}
                   </div>
                 )}
+                {neededBy &&
+                  Object.values(neededBy)
+                    .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
+                    .map((needed, index) => (
+                      <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
+                        <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
+                      </div>
+                    ))}
                 {!isMobile && item.userId !== user.userId && (
                   <div className="flex items-center justify-center">
-                    {neededBy && neededBy.some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
+                    {neededBy && Object.values(neededBy).some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
                       <button>
                         <FaRegTrashAlt onClick={() => removeNeededBy(user.userId, item.shoppingItemId)} className="text-2xl text-red-400" />
                       </button>
                     )}
-                    {!isMobile && neededBy && !neededBy.some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
+                    {!isMobile && neededBy && !Object.values(neededBy).some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
                       <button>
                         <IoMdAddCircleOutline onClick={() => addNeededBy(user?.userId, item.shoppingItemId)} className="text-3xl text-green-500" />
                       </button>
@@ -111,30 +113,32 @@ export function ShoppingList({ isMobile }: Props) {
       </ul>
       <h1 className="text-lg font-medium mt-4">Completed</h1>
       <ul>
-        {items
-          ?.filter((item) => item.status === "completed")
-          .map((item) => (
-            <li key={item.shoppingItemId} className={`grid grid-cols-1 grid-flow-col items-center gap-4 border-b-2 py-4 opacity-30 ${!isMobile ? "md:grid-cols-5" : ""} ${!isMobile && existingShopper && isShopperLoggedIn ? "md:grid-cols-5" : ""}`}>
-              <div>{item.title}</div>
-              <div>
-                <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-red-400 text-white dark:bg-red-500">{item.status}</span>
-              </div>
-              {!isMobile && (
-                <div className="flex -space-x-2 rtl:space-x-reverse mx-8">
-                  <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
-                    <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
+        {items &&
+          Object.values(items)
+            .filter((item) => item.status === "completed")
+            .map((item) => (
+              <li key={item.shoppingItemId} className={`grid grid-cols-1 grid-flow-col items-center gap-4 border-b-2 py-4 opacity-30 ${!isMobile ? "md:grid-cols-5" : ""} ${!isMobile && existingShopper && isShopperLoggedIn ? "md:grid-cols-5" : ""}`}>
+                <div>{item.title}</div>
+                <div>
+                  <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-red-400 text-white dark:bg-red-500">{item.status}</span>
+                </div>
+                {!isMobile && (
+                  <div className="flex -space-x-2 rtl:space-x-reverse mx-8">
+                    <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
+                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
+                    </div>
                   </div>
-                  {neededBy
-                    ?.filter((needed) => item.shoppingItemId === needed.shoppingItemId)
+                )}
+                {neededBy &&
+                  Object.values(neededBy)
+                    .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
                     .map((needed, index) => (
                       <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
                         <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
                       </div>
                     ))}
-                </div>
-              )}
-            </li>
-          ))}
+              </li>
+            ))}
       </ul>
     </>
   );

@@ -43,11 +43,6 @@ interface NeededBy {
   shoppingItemId: number;
 }
 
-interface UserCredentials {
-  username: string;
-  password: string;
-}
-
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { httpMethod, path } = event;
 
@@ -57,6 +52,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         return await getShoppingItems();
       case "PUT /shoppingItems":
         return await removeItem(event);
+      case "POST /shoppingItems":
+        return await addShoppingItem(event);
       case "GET /users":
         return await getUsers();
       case "GET /neededBy":
@@ -106,15 +103,15 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
         body: JSON.stringify({ error: "Missing request body" }),
       };
     }
-    const parsedBody = JSON.parse(event.body) as UserCredentials;
-    const { username, password } = parsedBody;
+    const parsedBody = JSON.parse(event.body);
+    const { name, username, password } = parsedBody;
 
     const existingUser = await getUserByUsername(client, username);
 
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await client.query('INSERT INTO "users" ("username", "hashedPassword") VALUES ($1, $2)', [username, hashedPassword]);
+      await client.query('INSERT INTO "users" ("name", "username", "hashedPassword") VALUES ($1, $2, $3)', [name, username, hashedPassword]);
 
       return {
         statusCode: 201,
@@ -123,15 +120,14 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
         },
         body: JSON.stringify({ message: "User created successfully" }),
       };
-    } else {
-      return {
-        statusCode: 409,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({ message: "Username already exists" }),
-      };
     }
+    return {
+      statusCode: 409,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({ message: "Username already exists" }),
+    };
   } finally {
     client.release();
   }
@@ -200,6 +196,16 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
     const result: QueryResult<Users> = await client.query('SELECT * FROM "users"');
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to get users" }),
+      };
+    }
+
     return {
       statusCode: 200,
       headers: {
@@ -215,7 +221,17 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
 async function getShoppingItems(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<ShoppingItem> = await client.query('SELECT * FROM "shoppingItems"');
+    const result: QueryResult<ShoppingItem[]> = await client.query('SELECT * FROM "shoppingItems"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to get shopping items" }),
+      };
+    }
     return {
       statusCode: 200,
       headers: {
@@ -228,6 +244,44 @@ async function getShoppingItems(): Promise<APIGatewayProxyResult> {
   }
 }
 
+async function addShoppingItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const client = await pool.connect();
+  try {
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" }),
+      };
+    }
+
+    const parsedBody = JSON.parse(event.body);
+    const { title, userId } = parsedBody;
+
+    const result: QueryResult<ShoppingItem> = await client.query('INSERT INTO "shoppingItems" ("title", "userId") values ($1, $2) RETURNING *', [title, userId]);
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to add shopping item" }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(result.rows[0]),
+    };
+  } finally {
+    client.release();
+  }
+}
+
+// Updates shopping item status from "pending" to "completed"
 async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
@@ -266,7 +320,17 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 async function getNeededBy(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ message: "No needed by users found" }),
+      };
+    }
     return {
       statusCode: 200,
       headers: {
@@ -296,6 +360,16 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
     await client.query('INSERT INTO "neededBy" ("userId", "shoppingItemId") values ($1, $2)', [userId, shoppingItemId]);
 
     const result: QueryResult<NeededBy> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to add needed by user" }),
+      };
+    }
 
     return {
       statusCode: 200,
@@ -335,10 +409,12 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (result.rowCount === 0) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "Item not found" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to remove needed by user" }),
       };
     }
-
     return {
       statusCode: 200,
       headers: {
@@ -431,6 +507,9 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     if (result.rowCount === 0) {
       return {
         statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({ error: "Shopper not found" }),
       };
     }
@@ -451,6 +530,17 @@ async function getMessages(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
     const result: QueryResult<Message[]> = await client.query('SELECT * FROM "messages"');
+
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to get messages" }),
+      };
+    }
+
     return {
       statusCode: 200,
       headers: {
@@ -478,6 +568,16 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
     const result: QueryResult<Message> = await client.query('INSERT INTO "messages" ("userId", "message", "timestamp") VALUES ($1, $2, $3) RETURNING *', [userId, message, timestamp]);
 
+    if (result.rowCount === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "Failed to add message" }),
+      };
+    }
+
     return {
       statusCode: 201,
       headers: {
@@ -492,5 +592,6 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
 async function getUserByUsername(client: any, username: string): Promise<any> {
   const result: QueryResult<Users> = await client.query('SELECT * FROM "users" WHERE "username" = $1', [username]);
+
   return result.rows[0];
 }
