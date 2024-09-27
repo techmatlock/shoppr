@@ -365,15 +365,15 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
     await client.query('INSERT INTO "neededBy" ("userId", "shoppingItemId") values ($1, $2)', [userId, shoppingItemId]);
 
-    const result: QueryResult<NeededBy> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
 
     if (result.rowCount === 0) {
       return {
-        statusCode: 404,
+        statusCode: 200,
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({ error: "Failed to add needed by user" }),
+        body: JSON.stringify({ error: "No needed by users" }),
       };
     }
 
@@ -406,23 +406,26 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const { userId, shoppingItemId } = parsedBody;
 
-    const result: QueryResult<NeededBy> = await client.query('DELETE FROM "neededBy" WHERE "userId" = $1 AND "shoppingItemId" = $2', [userId, shoppingItemId]);
+    await client.query('DELETE FROM "neededBy" WHERE "userId" = $1 AND "shoppingItemId" = $2', [userId, shoppingItemId]);
+
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
 
     if (result.rowCount === 0) {
       return {
-        statusCode: 404,
+        statusCode: 200,
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({ error: "Failed to remove needed by user" }),
+        body: JSON.stringify({ error: "No needed by users" }),
       };
     }
+
     return {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(result.rows[0]),
+      body: JSON.stringify(result.rows),
     };
   } finally {
     client.release();
