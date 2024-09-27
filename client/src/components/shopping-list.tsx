@@ -78,16 +78,16 @@ export function ShoppingList({ isMobile }: Props) {
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
                       <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
                     </div>
+                    {neededBy &&
+                      Object.values(neededBy)
+                        .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
+                        .map((needed, index) => (
+                          <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
+                            <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
+                          </div>
+                        ))}
                   </div>
                 )}
-                {neededBy &&
-                  Object.values(neededBy)
-                    .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
-                    .map((needed, index) => (
-                      <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
-                        <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(needed.name)}</span>
-                      </div>
-                    ))}
                 {!isMobile && item.userId !== user.userId && (
                   <div className="flex items-center justify-center">
                     {neededBy && Object.values(neededBy).some((needed) => needed.shoppingItemId === item.shoppingItemId) && (
