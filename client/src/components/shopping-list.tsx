@@ -24,8 +24,9 @@ export function ShoppingList({ isMobile }: Props) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ shoppingItemId }),
       };
-      const res = await fetch(`${apiUrl}/api/shoppingItems/${shoppingItemId}`, req);
+      const res = await fetch(`${apiUrl}/api/shoppingItems`, req);
       if (!res.ok) {
         throw new Error(`fetch Error: ${res.status}`);
       }
@@ -125,7 +126,7 @@ export function ShoppingList({ isMobile }: Props) {
                 {!isMobile && (
                   <div className="flex -space-x-2 rtl:space-x-reverse mx-8">
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
-                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
+                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.username)}</span>{" "}
                     </div>
                   </div>
                 )}
