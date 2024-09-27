@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "baseUrl": "./",
+    "baseUrl": "path.resolve(__dirname)",
     "paths": {
       "@/*": ["src/*"]
     },
