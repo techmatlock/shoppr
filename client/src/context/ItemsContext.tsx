@@ -80,7 +80,7 @@ export function ItemsProvider({ children }: Props) {
         await removeNeededBy(userId, shoppingItemId);
         return;
       }
-      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ export function ItemsProvider({ children }: Props) {
 
   async function removeNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const res = await fetch(`${apiUrl}/api/neededBy/${userId}`, {
+      const res = await fetch(`${apiUrl}/api/neededBy`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
