@@ -35,7 +35,7 @@ export function SideBar() {
     mutation.mutate({ userId, action });
   }
 
-  if (shopper !== null && !existingShopper) {
+  if (!existingShopper) {
     return (
       <div className="flex items-center justify-center flex-col">
         <p className="font-semibold">Current Shopper</p>
