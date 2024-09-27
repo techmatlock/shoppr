@@ -9,7 +9,6 @@ export type ItemsContextValues = {
   fetchItems: () => void;
   removeNeededBy: (itemId: number, shoppingItemId: number) => void;
   addNeededBy: (userId: number, shoppingItemId: number) => void;
-  checkIfNeedExists: (userId: number, shoppingItemId: number) => void;
 };
 
 export const ItemsContext = createContext<ItemsContextValues>({
@@ -19,7 +18,6 @@ export const ItemsContext = createContext<ItemsContextValues>({
   fetchItems: () => undefined,
   removeNeededBy: () => undefined,
   addNeededBy: () => undefined,
-  checkIfNeedExists: () => undefined,
 });
 
 type Props = {
@@ -168,7 +166,6 @@ export function ItemsProvider({ children }: Props) {
     fetchItems,
     removeNeededBy,
     addNeededBy,
-    checkIfNeedExists,
   };
 
   return <ItemsContext.Provider value={contextValue}>{children}</ItemsContext.Provider>;
