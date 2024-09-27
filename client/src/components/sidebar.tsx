@@ -1,6 +1,6 @@
-import { useUser } from "@/context/useUser";
-import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
+import { useUser } from "../context/useUser";
+import { apiUrl, getInitials } from "../lib/data";
 
 export function SideBar() {
   const { shopper, user, token, users, fetchShopper } = useUser();

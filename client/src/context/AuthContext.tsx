@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { authKey } from "@/lib/data";
+import { authKey } from "../lib/data";
 
 interface AuthContextValue {
   isAuthenticated: boolean;

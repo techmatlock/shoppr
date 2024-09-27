@@ -1,9 +1,9 @@
-import { useItems } from "@/context/useItems.tsx";
-import { useUser } from "@/context/useUser";
-import { apiUrl, getInitials } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { useUser } from "../context/useUser";
+import { useItems } from "../context/useItems";
+import { apiUrl, getInitials } from "../lib/data";
 
 type Props = {
   isMobile: boolean;

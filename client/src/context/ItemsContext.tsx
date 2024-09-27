@@ -1,6 +1,6 @@
-import { apiUrl, NeededBy, readToken, ShoppingItems } from "@/lib/data";
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { apiUrl, NeededBy, readToken, ShoppingItems } from "../lib/data";
 
 export type ItemsContextValues = {
   items: ShoppingItems[] | undefined;
@@ -33,6 +33,9 @@ export function ItemsProvider({ children }: Props) {
 
   useEffect(() => {
     setToken(readToken());
+  });
+
+  useEffect(() => {
     if (isAuthenticated) {
       async function loadPosts() {
         try {
@@ -47,7 +50,6 @@ export function ItemsProvider({ children }: Props) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    setToken(readToken());
     if (isAuthenticated) {
       async function loadNeededBy() {
         try {

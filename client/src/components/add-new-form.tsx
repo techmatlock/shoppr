@@ -1,8 +1,8 @@
-import { useItems } from "@/context/useItems";
-import { useUser } from "@/context/useUser";
-import { apiUrl } from "@/lib/data";
 import { useMutation } from "@tanstack/react-query";
 import { FormEvent, useRef } from "react";
+import { useItems } from "../context/useItems";
+import { useUser } from "../context/useUser";
+import { apiUrl } from "../lib/data";
 
 export function AddNewForm() {
   const { fetchItems } = useItems();

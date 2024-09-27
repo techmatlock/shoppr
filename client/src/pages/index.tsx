@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { AddNewForm } from "../components/add-new-form";
 import { ShoppingList } from "../components/shopping-list";
 import { SideBar } from "../components/sidebar";
-import { DropDownMenu } from "@/components/dropdown-menu";
 import { FaCartShopping } from "react-icons/fa6";
+import { DropDownMenu } from "../components/dropdown-menu";
 
 export function IndexPage() {
   const [isMobile, setIsMobile] = useState<boolean>(false);

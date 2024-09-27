@@ -5,10 +5,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { Input } from "../components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { apiUrl } from "@/lib/data";
+import { apiUrl } from "../lib/data";
+import { Button } from "../components/ui/button";
 
 const formSchema = z.object({
   name: z.string().min(8, {
