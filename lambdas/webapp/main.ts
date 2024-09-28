@@ -161,7 +161,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       };
     }
 
-    const { userId, hashedPassword } = existingUser;
+    const { name, userId, hashedPassword } = existingUser;
 
     const isPasswordValid = await bcrypt.compare(password, hashedPassword);
     if (!isPasswordValid) {
@@ -176,6 +176,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
 
     const payload = {
       userId,
+      name,
       username,
     };
     const token = jwt.sign(payload, process.env.SECRET_KEY);
