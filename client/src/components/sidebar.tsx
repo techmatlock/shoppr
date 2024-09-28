@@ -43,7 +43,7 @@ export function SideBar() {
         {existingShopper && ( // If existing shopper, let others know someone is already with user info in sidebar
           <>
             <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden my-2 bg-green-300 rounded-full dark:bg-gray-600">
-              <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(existingShopper.username)}</span>
+              <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(existingShopper.name)}</span>
             </div>
             <div>
               <div className="font-medium">{existingShopper.name}</div>
