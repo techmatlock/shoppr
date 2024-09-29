@@ -11,21 +11,12 @@ A full stack React project for users who want to group buy groceries in bulk and
 - [Challenges Encountered](#challenges-encountered)
 
 ## Technologies Used
-
-Non-serverless Deployment
-
-- PostgreSQL
-- Express
-- React
-- Node.js
-
-AWS Serverless Deployment
-
-- RDS (PostgreSQL)
-- React
-- S3
-- API Gateway
 - Lambda
+- API Gateway
+- RDS PostgreSQL
+- S3
+- React
+- TypeScript
 
 ## Features
 
@@ -33,6 +24,7 @@ AWS Serverless Deployment
 - Users can add shopping items
 - Users can remove or add to need item
 - Users can elect themselves to be the current shopper
+- Users can mark a shopping item as done
 
 ## Preview
 
