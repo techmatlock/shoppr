@@ -1,13 +1,13 @@
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { apiUrl, NeededBy, readToken, ShoppingItems } from "../lib/data";
+import { apiUrl, NeededBy, readToken, ShoppingItemWithUser } from "../lib/data";
 
 export type ItemsContextValues = {
-  items: ShoppingItems[] | undefined;
+  items: ShoppingItemWithUser[] | undefined;
   neededBy: NeededBy[] | undefined;
   getItems: () => void;
   fetchItems: () => void;
-  removeNeededBy: (itemId: number, shoppingItemId: number) => void;
+  removeNeededBy: (userId: number, shoppingItemId: number) => void;
   addNeededBy: (userId: number, shoppingItemId: number) => void;
 };
 
@@ -25,7 +25,7 @@ type Props = {
 };
 
 export function ItemsProvider({ children }: Props) {
-  const [items, setItems] = useState<ShoppingItems[]>([]);
+  const [items, setItems] = useState<ShoppingItemWithUser[]>([]);
   const [neededBy, setNeededBy] = useState<NeededBy[]>([]);
   const [token, setToken] = useState<string>();
   const { isAuthenticated } = useAuth();
@@ -114,7 +114,7 @@ export function ItemsProvider({ children }: Props) {
     }
   }
 
-  async function getItems(): Promise<ShoppingItems[]> {
+  async function getItems(): Promise<ShoppingItemWithUser[]> {
     const res = await fetch(`${apiUrl}/api/shoppingItems`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -122,7 +122,7 @@ export function ItemsProvider({ children }: Props) {
       },
     });
     if (!res.ok) throw new Error(`Response status: ${res.status}`);
-    return (await res.json()) as ShoppingItems[];
+    return (await res.json()) as ShoppingItemWithUser[];
   }
 
   // Get users that requested they need the shopping item
