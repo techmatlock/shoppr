@@ -1,4 +1,4 @@
-export type ShoppingItems = {
+export type ShoppingItemWithUser = {
   shoppingItemId: number;
   title: string;
   status: string;
@@ -8,16 +8,15 @@ export type ShoppingItems = {
   groupId: number;
 };
 
-export type NeededBy = {
-  userId: number;
-  name: string;
-  shoppingItemId: number;
-};
-
 export type User = {
   userId: number;
   name: string;
   username: string;
+};
+
+export type NeededBy = {
+  userId: number;
+  shoppingItemId: number;
 };
 
 export type Shopper = {
