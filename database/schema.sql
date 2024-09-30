@@ -23,7 +23,8 @@ CREATE TABLE "shoppingItems" (
 
 CREATE TABLE "neededBy" (
   "userId" integer,
-  "shoppingItemId" integer
+  "shoppingItemId" integer,
+  "name" text
 );
 
 CREATE TABLE "shopper" (
