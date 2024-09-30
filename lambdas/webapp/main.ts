@@ -14,18 +14,21 @@ const pool = new Pool({
   },
 });
 
-interface ShoppingItem {
-  shoppingItemId: number;
-  title: string;
-  status: string;
-  userId: number;
-}
-
 interface Users {
   userId: number;
   name: string;
   username: string;
   hashedPassword: string;
+}
+
+interface ShoppingItemWithUser {
+  shoppingItemId: number;
+  title: string;
+  status: string;
+  userId: number;
+  name: string;
+  username: string;
+  groupId: number;
 }
 
 interface Message {
@@ -222,7 +225,7 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
 async function getShoppingItems(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<ShoppingItem[]> = await client.query('SELECT * FROM "shoppingItems"');
+    const result: QueryResult<ShoppingItemWithUser[]> = await client.query('SELECT * FROM "shoppingItems" JOIN "users" USING ("userId")');
 
     if (result.rowCount === 0) {
       return {
@@ -258,7 +261,7 @@ async function addShoppingItem(event: APIGatewayProxyEvent): Promise<APIGatewayP
     const parsedBody = JSON.parse(event.body);
     const { title, userId } = parsedBody;
 
-    const result: QueryResult<ShoppingItem> = await client.query('INSERT INTO "shoppingItems" ("title", "userId") values ($1, $2) RETURNING *', [title, userId]);
+    const result: QueryResult<ShoppingItemWithUser> = await client.query('INSERT INTO "shoppingItems" ("title", "userId") values ($1, $2) RETURNING *', [title, userId]);
 
     if (result.rowCount === 0) {
       return {
@@ -296,11 +299,11 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
       };
     }
 
-    const parsedBody = JSON.parse(event.body) as ShoppingItem;
+    const parsedBody = JSON.parse(event.body) as ShoppingItemWithUser;
 
     const { shoppingItemId } = parsedBody;
 
-    const result: QueryResult<ShoppingItem> = await client.query('UPDATE "shoppingItems" SET status = $1 WHERE "shoppingItemId" = $2 RETURNING *', ["completed", shoppingItemId]);
+    const result: QueryResult<ShoppingItemWithUser> = await client.query('UPDATE "shoppingItems" SET status = $1 WHERE "shoppingItemId" = $2 RETURNING *', ["completed", shoppingItemId]);
 
     if (result.rowCount === 0) {
       return {
@@ -324,7 +327,7 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 async function getNeededBy(): Promise<APIGatewayProxyResult> {
   const client = await pool.connect();
   try {
-    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy"');
+    const result: QueryResult<NeededBy[]> = await client.query('SELECT * FROM "neededBy" JOIN "users" USING ("userId")');
 
     if (result.rowCount === 0) {
       return {
@@ -335,6 +338,7 @@ async function getNeededBy(): Promise<APIGatewayProxyResult> {
         body: JSON.stringify({ message: "No needed by users found" }),
       };
     }
+
     return {
       statusCode: 200,
       headers: {
@@ -360,7 +364,7 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
       };
     }
 
-    const parsedBody = JSON.parse(event.body) as ShoppingItem;
+    const parsedBody = JSON.parse(event.body) as NeededBy;
 
     const { userId, shoppingItemId } = parsedBody;
 
