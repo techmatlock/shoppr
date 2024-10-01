@@ -126,18 +126,18 @@ export function ShoppingList({ isMobile }: Props) {
                 {!isMobile && (
                   <div className="flex -space-x-2 rtl:space-x-reverse mx-8">
                     <div className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-blue-300 rounded-full dark:bg-gray-600">
-                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>{" "}
+                      <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(item.name)}</span>
                     </div>
+                    {neededBy &&
+                      Object.values(neededBy)
+                        .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
+                        .map((needed) => (
+                          <div key={needed.shoppingItemId} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
+                            <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(users?.find((u) => u.userId === needed.userId)?.name || "")}</span>
+                          </div>
+                        ))}
                   </div>
                 )}
-                {neededBy &&
-                  Object.values(neededBy)
-                    .filter((needed) => item.shoppingItemId === needed.shoppingItemId)
-                    .map((needed, index) => (
-                      <div key={index} className="relative flex justify-center items-center w-10 h-10 overflow-hidden bg-green-300 rounded-full dark:bg-gray-600">
-                        <span className="font-medium text-gray-600 dark:text-gray-300">{getInitials(users?.find((u) => u.userId === needed.userId)?.name || "")}</span>
-                      </div>
-                    ))}
               </li>
             ))}
       </ul>
