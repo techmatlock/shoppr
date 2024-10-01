@@ -22,6 +22,11 @@ A full stack React project for users who want to group buy groceries in bulk and
 - React
 - TypeScript
 
+## Live Demo
+http://shoppr.cloud.s3-website-us-east-1.amazonaws.com/
+Username: guest  
+Password: password
+
 ## Features
 
 - Users can register and login
