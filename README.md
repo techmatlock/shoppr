@@ -4,9 +4,10 @@ A full stack React project for users who want to group buy groceries in bulk and
 
 ## Table of Contents
 
-- [Technologies Used](#technologies-used)
-- [Features](#features)
 - [Preview](#preview)
+- [Technologies Used](#technologies-used)
+- [Live Demo](#live-demo)
+- [Features](#features)
 - [Installation](#installation)
 - [Challenges Encountered](#challenges-encountered)
 
@@ -15,6 +16,7 @@ A full stack React project for users who want to group buy groceries in bulk and
 ![Recording 2024-09-18 at 16 45 05](https://github.com/user-attachments/assets/00b1de4b-b80c-4192-9be6-73620f8dcac9)
 
 ## Technologies Used
+
 - Lambda
 - API Gateway
 - RDS PostgreSQL
@@ -23,6 +25,7 @@ A full stack React project for users who want to group buy groceries in bulk and
 - TypeScript
 
 ## Live Demo
+
 http://shoppr.cloud.s3-website-us-east-1.amazonaws.com/
 
 Username: guest  
@@ -88,16 +91,12 @@ If your project will be using a database, create it now.
 
 4. Some tables in the SQL statements for my Lambda handler weren't enclosed in quotes, so when the user hit the API Gateway endpoint, the SQL query failed because the table name "lowercasedtable" did not exist. I enclosed the tables in quotes, which preserved case sensitivity and prevented the table names from being lowercased during the `npm run build`.
 
-5. In one of my Lambda handler routes, I wasn't correctly accessing the property in the request body. I was trying to send the entire object instead of just the `shoppingItemId` in the SQL delete query. The error I was getting was: `Error: invalid input syntax for type integer: "{"shoppingItemId": 1}"`. I fixed this by correctly accessing `shoppingItemId` with dot notation: `const shoppingItemId: number = JSON.parse(event.body)?.shoppingItemId;`.
+5. I had to change how I was using the filter method in my shopping list. Initially I thought i could access the state array items, but realized I needed to access the array of objects. So I was trying to use filter on an array without objects and ran into frontend application errors. I changed the filter function to access the object with Object.values().
 
-6. I had to change how I was using the filter method in my shopping list. Initially I thought i could access the state array items, but didn't realize it's an object, with an array of objects. So I was trying to use filter on a non-array and ran into frontend issues. I changed the non-arrays using filter to Object.values.
+6. My shopping list had a button to update the "needed by" column, but since the shopping list and "needed by" used separate state variables, I had to nest a second state in the JSX and filter the results to match the "needed by" shopping item ID with the shopping item ID for each list item. This was challenging because I had separate POST and DELETE calls to the database, and then I needed to update two different states, causing the shopping list component to re-render.
 
-7. There were instances where the Lambda handler had an incorrect property ID when accessing the query string from the event object: `event.queryStringParameters?.userId`. For example, I used the keyword `id` instead of `userId`, resulting in a `400: required parameters not found` error.
+7. Another problem with the shopping list occurred when I clicked the button to add myself to the "needed by" column, but I wasn't checking if a row already existed when the user had already clicked the button. As a result, the icon wasn't changing to a delete icon because the POST call wasn't checking for an existing row. I added a `checkIfNeedExists` function to return true or false, and if true, remove the current user from the database.
 
-8. My shopping list had a button to update the "needed by" column, but since the shopping list and "needed by" used separate state variables, I had to nest a second state in the JSX and filter the results to match the "needed by" shopping item ID with the shopping item ID for each list item. This was challenging because I had separate POST and DELETE calls to the database, and then I needed to update two different states, causing the shopping list component to re-render.
+8. I encountered a bug where my `shopper` state variable was returning undefined, even though I could send a GET request with Postman and receive a successful response. The issue was in my `server.ts` with the Express route, where I needed to destructure the array: `const [shopper] = result.rows`. Once I made the change, I was able to retrieve the correct `userId` from the `shopper` table.
 
-9. Another problem with the shopping list occurred when I clicked the button to add myself to the "needed by" column, but I wasn't checking if a row already existed when the user had already clicked the button. As a result, the icon wasn't changing to a delete icon because the POST call wasn't checking for an existing row. I added a `checkIfNeedExists` function to return true or false, and if true, remove the current user from the database.
-
-10. I encountered a bug where my `shopper` state variable was returning undefined, even though I could send a GET request with Postman and receive a successful response. The issue was in my `server.ts` with the Express route, where I needed to destructure the array: `const [shopper] = result.rows`. Once I made the change, I was able to retrieve the correct `userId` from the `shopper` table.
-
-11. When I implemented sockets for a real-time chatbox, I realized that the server connection displayed the results in real time, but if the user refreshed the page, the chat would be cleared. To persist the messages, I modified my database schema by adding a `messages` table. After that, in the `ChatBox` component, I created a POST request to the database, and upon success, fetched the new messages from the database.
+9. When I implemented sockets for a real-time chatbox, I realized that the server connection displayed the results in real time, but if the user refreshed the page, the chat would be cleared. To persist the messages, I modified my database schema by adding a `messages` table. After that, in the `ChatBox` component, I created a POST request to the database, and upon success, fetched the new messages from the database.
