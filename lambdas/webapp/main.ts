@@ -1,50 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { Pool, QueryResult } from "pg";
+import { QueryResult } from "pg";
 import * as bcrypt from "bcryptjs";
+import { pool } from "./lib/db";
+import { Message, NeededBy, Shopper, ShoppingItemWithUser, Users } from "./lib/data";
 const jwt = require("jsonwebtoken");
-
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT || "5432"),
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
-
-interface Users {
-  userId: number;
-  name: string;
-  username: string;
-  hashedPassword: string;
-}
-
-interface ShoppingItemWithUser {
-  shoppingItemId: number;
-  title: string;
-  status: string;
-  userId: number;
-  name: string;
-  username: string;
-  groupId: number;
-}
-
-interface Message {
-  userId: number;
-  message: string;
-  timestamp: string;
-}
-
-interface Shopper {
-  userId: number;
-}
-
-interface NeededBy {
-  userId: number;
-  shoppingItemId: number;
-}
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const { httpMethod, path } = event;

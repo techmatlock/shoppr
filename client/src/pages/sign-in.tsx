@@ -52,7 +52,6 @@ export function SignInPage() {
       }
       const { user, token } = (await res.json()) as AuthData;
       handleSignIn(user, token);
-      navigate("/");
     },
     onSuccess: () => {
       navigate("/");
