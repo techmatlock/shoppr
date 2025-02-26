@@ -24,7 +24,7 @@ export function AddNewForm() {
         },
         body: JSON.stringify(newPost),
       };
-      const res = await fetch(`${apiUrl}/api/shoppingItems`, req);
+      const res = await fetch(`${apiUrl}/shoppingItems`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }

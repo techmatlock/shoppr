@@ -80,7 +80,7 @@ export function ItemsProvider({ children }: Props) {
         await removeNeededBy(userId, shoppingItemId);
         return;
       }
-      const res = await fetch(`${apiUrl}/api/neededBy`, {
+      const res = await fetch(`${apiUrl}/neededBy`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ export function ItemsProvider({ children }: Props) {
 
   async function removeNeededBy(userId: number, shoppingItemId: number) {
     try {
-      const res = await fetch(`${apiUrl}/api/neededBy`, {
+      const res = await fetch(`${apiUrl}/neededBy`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ export function ItemsProvider({ children }: Props) {
   }
 
   async function getItems(): Promise<ShoppingItemWithUser[]> {
-    const res = await fetch(`${apiUrl}/api/shoppingItems`, {
+    const res = await fetch(`${apiUrl}/shoppingItems`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -127,7 +127,7 @@ export function ItemsProvider({ children }: Props) {
 
   // Get users that requested they need the shopping item
   async function getNeededBy(): Promise<NeededBy[]> {
-    const res = await fetch(`${apiUrl}/api/neededBy`, {
+    const res = await fetch(`${apiUrl}/neededBy`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

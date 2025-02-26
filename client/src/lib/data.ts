@@ -37,7 +37,7 @@ type Auth = {
   token: string;
 };
 
-export const apiUrl = "https://p6q481zlid.execute-api.us-east-1.amazonaws.com";
+export const apiUrl = "https://2nwv6xrcc3.execute-api.us-east-1.amazonaws.com/prod";
 
 export function saveAuth(user: User, token: string): void {
   const auth: Auth = { user, token };
