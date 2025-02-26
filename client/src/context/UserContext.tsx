@@ -37,7 +37,7 @@ export function UserProvider({ children }: Props) {
   useEffect(() => {
     setUser(readUser());
     setToken(readToken());
-  });
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -89,7 +89,7 @@ export function UserProvider({ children }: Props) {
   }
 
   async function getShopper(): Promise<Shopper> {
-    const res = await fetch(`${apiUrl}/api/shopper`, {
+    const res = await fetch(`${apiUrl}/shopper`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export function UserProvider({ children }: Props) {
   }
 
   async function getUsers(): Promise<User[]> {
-    const res = await fetch(`${apiUrl}/api/users`, {
+    const res = await fetch(`${apiUrl}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
