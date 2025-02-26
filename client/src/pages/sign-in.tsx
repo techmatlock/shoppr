@@ -46,7 +46,7 @@ export function SignInPage() {
         },
         body: JSON.stringify(values),
       };
-      const res = await fetch(`${apiUrl}/api/sign-in`, req);
+      const res = await fetch(`${apiUrl}/sign-in`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }
