@@ -18,7 +18,7 @@ export function SideBar() {
         },
         body: JSON.stringify({ userId }),
       };
-      const res = await fetch(`${apiUrl}/api/shopper`, req);
+      const res = await fetch(`${apiUrl}/shopper`, req);
       if (!res.ok) {
         throw new Error(`fetch Error ${res.status}`);
       }

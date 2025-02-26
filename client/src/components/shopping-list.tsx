@@ -26,7 +26,7 @@ export function ShoppingList({ isMobile }: Props) {
         },
         body: JSON.stringify({ shoppingItemId }),
       };
-      const res = await fetch(`${apiUrl}/api/shoppingItems`, req);
+      const res = await fetch(`${apiUrl}/shoppingItems`, req);
       if (!res.ok) {
         throw new Error(`fetch Error: ${res.status}`);
       }
