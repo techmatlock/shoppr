@@ -1,6 +1,7 @@
 import { ReactNode, useState, createContext, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { apiUrl, NeededBy, readToken, ShoppingItemWithUser } from "../lib/data";
+import { apiUrl, NeededBy, ShoppingItemWithUser } from "../lib/data";
+import { useUser } from "./useUser";
 
 export type ItemsContextValues = {
   items: ShoppingItemWithUser[] | undefined;
@@ -27,13 +28,9 @@ type Props = {
 export function ItemsProvider({ children }: Props) {
   const [items, setItems] = useState<ShoppingItemWithUser[]>([]);
   const [neededBy, setNeededBy] = useState<NeededBy[]>([]);
-  const [token, setToken] = useState<string>();
+  const { token } = useUser();
   const { isAuthenticated } = useAuth();
   const [error, setError] = useState<unknown>();
-
-  useEffect(() => {
-    setToken(readToken());
-  });
 
   useEffect(() => {
     if (isAuthenticated) {
