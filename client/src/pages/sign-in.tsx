@@ -10,6 +10,7 @@ import { apiUrl, User } from "../lib/data";
 import { useUser } from "../context/useUser";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import { useAuth } from "../context/AuthContext";
 
 const formSchema = z.object({
   username: z.string().min(5, {
@@ -26,8 +27,9 @@ type AuthData = {
 };
 
 export function SignInPage() {
-  const navigate = useNavigate();
   const { handleSignIn } = useUser();
+  const { setIsAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,6 +56,7 @@ export function SignInPage() {
       handleSignIn(user, token);
     },
     onSuccess: () => {
+      setIsAuthenticated(true);
       navigate("/");
     },
     onError: (err: Error) => {
