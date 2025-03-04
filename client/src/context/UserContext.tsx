@@ -6,6 +6,7 @@ export type UserContextValues = {
   user: User | undefined;
   users: User[] | undefined;
   token: string | undefined;
+  setToken: (token: string) => void;
   shopper: Shopper | undefined;
   handleSignIn: (user: User, token: string) => void;
   handleSignOut: () => void;
@@ -16,6 +17,7 @@ export const UserContext = createContext<UserContextValues>({
   user: undefined,
   users: undefined,
   token: undefined,
+  setToken: () => undefined,
   shopper: undefined,
   handleSignIn: () => undefined,
   handleSignOut: () => undefined,
@@ -114,6 +116,6 @@ export function UserProvider({ children }: Props) {
     return <div>Error! {error instanceof Error ? error.message : "Unknown error"}</div>;
   }
 
-  const contextValue = { user, users, token, shopper, handleSignIn, handleSignOut, fetchShopper };
+  const contextValue = { user, users, token, setToken, shopper, handleSignIn, handleSignOut, fetchShopper };
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
