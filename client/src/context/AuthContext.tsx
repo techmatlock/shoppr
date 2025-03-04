@@ -3,10 +3,11 @@ import { authKey } from "../lib/data";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  return <AuthContext.Provider value={{ isAuthenticated, loading }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, loading }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
