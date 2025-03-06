@@ -1,16 +1,16 @@
-import type { Config } from "jest";
-
-const config: Config = {
+module.exports = {
+  preset: "ts-jest",
   testEnvironment: "jsdom",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   transform: {
     "^.+\\.tsx?$": "ts-jest",
-    "^.+\\.jsx?$": "babel-jest", // For JS/JSX files
   },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
-  moduleNameMapper: {
-    "\\.(css|less|sass|scss)$": "identity-obj-proxy", // Mock styles
+  globals: {
+    "ts-jest": {
+      tsconfig: {
+        jsx: "react-jsx",
+      },
+    },
   },
-  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };
-
-export default config;
