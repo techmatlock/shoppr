@@ -60,7 +60,7 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing request body" }),
       };
@@ -78,7 +78,7 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       return {
         statusCode: 201,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ message: "User created successfully" }),
       };
@@ -86,7 +86,7 @@ async function signUp(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     return {
       statusCode: 409,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify({ message: "Username already exists" }),
     };
@@ -102,7 +102,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing request body" }),
       };
@@ -117,7 +117,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       return {
         statusCode: 401,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ message: "Invalid credentials" }),
       };
@@ -130,7 +130,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
       return {
         statusCode: 401,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ message: "Invalid credentials" }),
       };
@@ -146,7 +146,7 @@ async function signIn(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResul
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify({ user: payload, token }),
     };
@@ -163,7 +163,7 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to get users" }),
       };
@@ -172,7 +172,7 @@ async function getUsers(): Promise<APIGatewayProxyResult> {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -190,7 +190,7 @@ async function getShoppingItems(): Promise<APIGatewayProxyResult> {
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to get shopping items" }),
       };
@@ -198,7 +198,7 @@ async function getShoppingItems(): Promise<APIGatewayProxyResult> {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -226,7 +226,7 @@ async function addShoppingItem(event: APIGatewayProxyEvent): Promise<APIGatewayP
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to add shopping item" }),
       };
@@ -235,7 +235,7 @@ async function addShoppingItem(event: APIGatewayProxyEvent): Promise<APIGatewayP
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
@@ -252,7 +252,7 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
@@ -274,7 +274,7 @@ async function removeItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
@@ -292,7 +292,7 @@ async function getNeededBy(): Promise<APIGatewayProxyResult> {
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ message: "No needed by users found" }),
       };
@@ -301,7 +301,7 @@ async function getNeededBy(): Promise<APIGatewayProxyResult> {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -317,7 +317,7 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
@@ -335,7 +335,7 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "No needed by users" }),
       };
@@ -344,7 +344,7 @@ async function addNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -360,7 +360,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
@@ -378,7 +378,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "No needed by users" }),
       };
@@ -387,7 +387,7 @@ async function removeNeededBy(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -405,7 +405,7 @@ async function getShopper(): Promise<APIGatewayProxyResult> {
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ message: "No shopper found" }),
       };
@@ -413,7 +413,7 @@ async function getShopper(): Promise<APIGatewayProxyResult> {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
@@ -429,7 +429,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
@@ -445,7 +445,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to add shopper." }),
       };
@@ -454,7 +454,7 @@ async function addShopper(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     return {
       statusCode: 201,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
@@ -470,7 +470,7 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       return {
         statusCode: 400,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Missing required parameters" }),
       };
@@ -486,7 +486,7 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Shopper not found" }),
       };
@@ -495,7 +495,7 @@ async function removeShopper(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
@@ -513,7 +513,7 @@ async function getMessages(): Promise<APIGatewayProxyResult> {
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to get messages" }),
       };
@@ -522,7 +522,7 @@ async function getMessages(): Promise<APIGatewayProxyResult> {
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows),
     };
@@ -550,7 +550,7 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
       return {
         statusCode: 404,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.CORS_URL as string,
         },
         body: JSON.stringify({ error: "Failed to add message" }),
       };
@@ -559,7 +559,7 @@ async function addMessage(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
     return {
       statusCode: 201,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.CORS_URL as string,
       },
       body: JSON.stringify(result.rows[0]),
     };
