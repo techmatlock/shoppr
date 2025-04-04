@@ -81,6 +81,16 @@ If your project will be using a database, create it now.
 3. In a separate terminal, run `psql -d <databasebaseUrl> -f data.sql schema.sql` to create your tables
 4. After any changes to `database/schema.sql` or `database/data.sql` re-run the `psql <databasebaseUrl> -f data.sql -f schema.sql` command to update your database. Use `psql` to verify your changes were successfully applied.
 
+### Lambda
+
+1. cd /lambdas/webapp
+2. npm run build
+3. cp -r node_modules dist
+4. cd dist
+5. zip -r ../webapp.zip .
+6. cd ..
+7. aws lambda update-function-code --function-name shoppr --zip-file fileb://webapp.zip
+
 ## Challenges Encountered
 
 1. I was getting a 401 Unauthorized error from the frontend when trying to fetch routes protected by a Lambda authorizer in API Gateway. Initially, the token I was retrieving from context was not being fetched when the component mounted, so when my routes were called, no token was being sent in the Authorization header. I fixed the issue by calling `readToken` and `readUser` functions to get the credentials in a `useEffect` before making the fetch calls in the component.
